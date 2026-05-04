@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, shrink-to-fit=yes">
+  <title>Delix Assis — AI Chat</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #09090b; --surface: #111113; --surface2: #1a1a1e; --hover: #222226;
+      --border: rgba(255, 255, 255, 0.06); --accent: #6366f1; --accent2: #818cf8;
+      --text: #fafafa; --text2: #a1a1aa; --text3: #71717a;
+      --danger: #ef4444; --success: #10b981; --warning: #f59e0b;
+      --glass: rgba(17,17,19,0.7);
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--bg); color: var(--text);
+    }
+    body { height: 100dvh; overflow: hidden; display: flex; justify-content: center; align-items: center; }
+    #app {
+      width: 100%; height: 100dvh; max-width: 1200px; display: flex; flex-direction: column;
+      background: var(--bg); position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+      overflow: hidden;
+    }
+    @media (min-width: 768px) {
+      #app { border-radius: 2rem; margin: 16px; height: calc(100dvh - 32px); border: 1px solid var(--border); }
+    }
+    ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
+    
+    .sidebar {
+      width: 280px; background: var(--surface); border-right: 1px solid var(--border);
+      display: flex; flex-direction: column; transition: 0.3s; flex-shrink: 0;
+    }
+    @media (max-width: 767px) {
+      .sidebar { position: fixed; left: -300px; top: 0; bottom: 0; z-index: 50; width: 280px; }
+      .sidebar.open { left: 0; }
+      .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 40; display: none; }
+      .overlay.open { display: block; }
+    }
+    .main-chat { flex: 1; display: flex; flex-direction: column; min-width: 0; background: var(--bg); }
+    .header {
+      padding: 12px 16px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 12px; background: var(--glass);
+      backdrop-filter: blur(12px); z-index: 10;
+    }
+    .btn-icon {
+      background: transparent; border: none; color: var(--text2); width: 36px; height: 36px;
+      display: flex; align-items: center; justify-content: center; border-radius: 50%;
+      cursor: pointer; transition: 0.2s; font-size: 18px;
+    }
+    .btn-icon:hover { background: var(--hover); color: var(--text); }
+    .model-selector {
+      background: var(--surface2); border: 1px solid var(--border); border-radius: 2rem;
+      padding: 6px 14px; font-size: 13px; color: var(--text); display: flex; align-items: center;
+      gap: 6px; cursor: pointer; flex: 1; max-width: 250px;
+    }
+    .model-selector:hover { border-color: var(--accent); }
+    .messages {
+      flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 16px;
+    }
+    .msg { display: flex; gap: 10px; max-width: 90%; animation: fadeIn 0.3s ease-out; }
+    .msg.user { align-self: flex-end; flex-direction: row-reverse; }
+    .msg-bubble {
+      padding: 12px 16px; border-radius: 1.25rem; font-size: 14px; line-height: 1.6;
+      background: var(--surface2); border: 1px solid var(--border); word-break: break-word;
+    }
+    .msg.user .msg-bubble { background: #2563eb; border: none; color: white; }
+    .avatar {
+      width: 36px; height: 36px; border-radius: 50%; background: var(--surface2);
+      display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;
+      border: 1px solid var(--border);
+    }
+    .input-area {
+      padding: 12px 16px; border-top: 1px solid var(--border); background: var(--glass);
+      backdrop-filter: blur(12px); display: flex; flex-direction: column; gap: 8px;
+    }
+    .attachments-preview { display: flex; gap: 8px; flex-wrap: wrap; padding: 4px 0; }
+    .attachment-item {
+      position: relative; display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 10px; background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 0.75rem; font-size: 12px; max-width: 200px;
+    }
+    .attachment-item img { width: 40px; height: 40px; object-fit: cover; border-radius: 0.5rem; }
+    .attachment-remove {
+      position: absolute; top: -6px; right: -6px; width: 20px; height: 20px;
+      background: var(--danger); border: none; color: white; border-radius: 50%;
+      cursor: pointer; font-size: 10px; display: flex; align-items: center; justify-content: center;
+    }
+    .input-row { display: flex; gap: 8px; align-items: flex-end; }
+    .input-wrap {
+      flex: 1; background: var(--surface2); border: 1px solid var(--border); border-radius: 1.5rem;
+      display: flex; align-items: flex-end; padding: 4px; transition: 0.2s;
+    }
+    .input-wrap:focus-within { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(99,102,241,0.2); }
+    textarea {
+      flex: 1; background: transparent; border: none; color: var(--text); resize: none;
+      padding: 8px 12px; font-size: 14px; max-height: 120px; outline: none; font-family: inherit;
+    }
+    .send-btn {
+      background: var(--accent); border: none; color: white; width: 42px; height: 42px;
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 20px; flex-shrink: 0;
+    }
+    .send-btn:hover:not(:disabled) { background: var(--accent2); }
+    .send-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .attach-btn {
+      background: var(--surface2); border: 1px solid var(--border); color: var(--text2);
+      width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center;
+      justify-content: center; cursor: pointer; font-size: 20px;
+    }
+    .attach-btn:hover { background: var(--hover); color: var(--text); border-color: var(--accent); }
+    .sidebar-header { padding: 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
+    .logo { font-weight: 700; font-size: 20px; background: linear-gradient(135deg, #818cf8, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .new-chat-btn {
+      background: var(--accent); border: none; color: white; padding: 10px 16px; border-radius: 2rem;
+      font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 13px;
+      margin: 12px;
+    }
+    .new-chat-btn:hover { background: var(--accent2); }
+    .chat-list { flex: 1; overflow-y: auto; padding: 0 8px; }
+    .chat-item {
+      padding: 12px; border-radius: 0.75rem; cursor: pointer; font-size: 13px;
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;
+      color: var(--text2); gap: 8px;
+    }
+    .chat-item:hover { background: var(--hover); color: var(--text); }
+    .chat-item.active { background: var(--surface2); color: var(--text); }
+    .chat-item-title { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    
+    .msg-files { display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px; }
+    .msg-file {
+      display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+      background: rgba(255,255,255,0.08); border-radius: 0.75rem; border: 1px solid var(--border);
+    }
+    .msg-image { max-width: 200px; max-height: 200px; border-radius: 0.75rem; cursor: pointer; border: 1px solid var(--border); }
+    
+    .modal {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+      display: flex; align-items: center; justify-content: center; z-index: 100;
+    }
+    .modal-content {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 1.5rem;
+      padding: 24px; width: 90%; max-width: 500px; max-height: 80vh; overflow-y: auto;
+    }
+    .badge { font-size: 10px; background: var(--accent); color: white; padding: 2px 8px; border-radius: 12px; margin-left: 6px; font-weight: 600; }
+    .pro-badge { background: linear-gradient(135deg, #f59e0b, #ef4444); }
+    
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .typing { display: flex; gap: 4px; padding: 8px; }
+    .typing span { width: 6px; height: 6px; background: var(--text3); border-radius: 50%; animation: bounce 1s infinite; }
+    .typing span:nth-child(2){animation-delay:0.2s;} .typing span:nth-child(3){animation-delay:0.4s;}
+    @keyframes bounce { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-6px);} }
+    
+    .code-block-wrapper { margin: 8px 0; border-radius: 0.5rem; overflow: hidden; border: 1px solid #333; background: #1a1a2e; }
+    .code-block-header { display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; background: #16213e; border-bottom: 1px solid #333; font-size: 11px; color: #a0a0b0; }
+    .code-copy-btn { background: #2a2a4a; border: 1px solid #444; color: #c0c0d0; padding: 3px 8px; border-radius: 4px; cursor: pointer; font-size: 10px; }
+    .code-copy-btn.copied { background: #065f46; border-color: #10b981; color: #d1fae5; }
+    .code-block-content { padding: 10px; overflow-x: auto; font-size: 12px; line-height: 1.4; color: #e0e0e0; white-space: pre; max-height: 400px; overflow-y: auto; }
+    .inline-code { background: #2a2a3e; padding: 2px 6px; border-radius: 3px; font-family: 'Courier New', monospace; font-size: 0.9em; }
+    
+    .theme-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; }
+    .theme-dot { width: 100%; aspect-ratio: 1; border-radius: 0.75rem; cursor: pointer; border: 2px solid transparent; }
+    .theme-dot.active { border-color: white; }
+    .category-tabs { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 12px; }
+    .category-tab { padding: 5px 10px; border-radius: 1rem; font-size: 11px; cursor: pointer; background: var(--surface2); border: 1px solid transparent; color: var(--text2); }
+    .category-tab.active { background: var(--accent); color: white; }
+    .model-category-badge { font-size: 9px; padding: 2px 6px; border-radius: 8px; font-weight: 600; }
+    .category-reasoning { background: rgba(139, 92, 246, 0.2); color: #a78bfa; }
+    .category-general { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+    .category-coding { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+    .category-multimodal { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+    
+    .error-banner {
+      background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3);
+      padding: 12px 16px; border-radius: 1rem; margin: 8px 0; font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+<div id="app"></div>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script type="text/babel">
+  const APP_CONFIG = {
+    api: {
+      url: 'https://api.intelligence.io.solutions/api/v1/chat/completions',
+      token: 'io-v2-eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJvd25lciI6Ijc0YzdhZTM2LTA3MzktNDQzZi05Mzg5LTliNTNlY2RhMTAyYSIsImV4cCI6NDkyODQwNDA3Mn0.XgMNRxnpE7Qf1EFWJhKh2j0-sSGsWEMYfVT22FHpAOEfkgOP11kLd2kzjO8mDThM0fpDFTss408raX79m2lILg',
+      categories: {
+        reasoning: { name: 'Логика', icon: '🧠' },
+        general: { name: 'Общие', icon: '🤖' },
+        coding: { name: 'Код', icon: '💻' },
+        multimodal: { name: 'Мульти', icon: '👁️' }
+      },
+      models: {
+        'deepseek-ai/DeepSeek-R1-0528': {name:'DeepSeek R1',developer:'DeepSeek',description:'Логика и алгоритмы',category:'reasoning',icon:'🧠',maxTokens:4096},
+        'meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8': {name:'Llama 4 Maverick',developer:'Meta AI',description:'Мультимодальная MoE',category:'multimodal',icon:'🦙',maxTokens:4096},
+        'gpt-oss-120b': {name:'GPT-OSS 120B',developer:'Open AI',description:'117B параметров',category:'general',icon:'🤖',maxTokens:8192},
+        'Intel/Qwen3-Coder-480B-A35B-Instruct-int4-mixed-ar': {name:'Qwen3 Coder',developer:'Qwen',description:'Генерация кода',category:'coding',icon:'💻',maxTokens:4096},
+        'Qwen3-Next-80B-A3B-Instruct': {name:'Qwen3 Next',developer:'Qwen',description:'Инструкции и диалоги',category:'general',icon:'🔮',maxTokens:4096},
+        'gpt-oss-20b': {name:'GPT-OSS 20B',developer:'Open AI',description:'Текст',category:'general',icon:'📝',maxTokens:4096},
+        'Qwen3-235B-A22B-Thinking-2507': {name:'Qwen3 235B',developer:'Qwen',description:'Глубокий анализ',category:'reasoning',icon:'🤔',maxTokens:4096},
+        'mistralai/Mistral-Nemo-Instruct-2407': {name:'Mistral Nemo',developer:'Mistral AI',description:'Логические задачи',category:'reasoning',icon:'🌊',maxTokens:4096},
+        'meta-llama/Llama-3.3-70B-Instruct': {name:'Llama 3.3 70B',developer:'Meta AI',description:'Диалоги',category:'general',icon:'🦊',maxTokens:4096},
+        'moonshotai/Kimi-K2-Instruct-0905': {name:'Kimi K2',developer:'Moonshot AI',description:'MoE 1T параметров',category:'general',icon:'🚀',maxTokens:4096},
+        'deepseek-ai/DeepSeek-V3.2': {name:'DeepSeek V3.2',developer:'DeepSeek',description:'Флагманская',category:'reasoning',icon:'👑',maxTokens:8192}
+      },
+      defaultModel: 'deepseek-ai/DeepSeek-V3.2'
+    },
+    storage: {prefix:'delix_ai_',version:'v3.3'},
+    maxFileSize: 10 * 1024 * 1024,
+    readableExtensions: ['txt','html','htm','css','js','jsx','ts','tsx','json','xml','md','py','java','cpp','c','h','php','rb','go','rs','sql','yaml','yml','toml','ini','cfg','log','csv','svg']
+  };
+
+  const themes = {
+    default: { name: 'Тёмная', bg: '#09090b' },
+    ocean: { name: 'Океан', bg: '#0b172a' },
+    forest: { name: 'Лес', bg: '#0f1c15' },
+    sunset: { name: 'Закат', bg: '#1f111a' }
+  };
+
+  const { useState, useEffect, useRef, useCallback } = React;
+  const STORAGE = (key) => `${APP_CONFIG.storage.prefix}${key}`;
+
+  function formatFileSize(bytes) {
+    if (!bytes) return '0 B';
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  }
+
+  function getFileExtension(name) {
+    return (name || '').split('.').pop()?.toLowerCase() || '';
+  }
+
+  function isReadableFile(name) {
+    return APP_CONFIG.readableExtensions.includes(getFileExtension(name));
+  }
+
+  function readFileContent(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => resolve(e.target.result);
+      reader.onerror = reject;
+      reader.readAsText(file);
+    });
+  }
+
+  function readFileAsDataURL(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => resolve(e.target.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function formatText(text) {
+    if (!text) return '';
+    let html = text
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g, '<em>$1</em>')
+      .replace(/`([^`]+)`/g, '<code class="inline-code">$1</code>')
+      .replace(/\n/g, '<br/>');
+    
+    html = html.replace(/```(\w+)?\n?([\s\S]*?)```/g, (match, lang, code) => {
+      const escaped = code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      const encoded = encodeURIComponent(code);
+      return `<div class="code-block-wrapper">
+        <div class="code-block-header"><span>📄 ${lang||'code'}</span><button class="code-copy-btn" data-code="${encoded}">Копировать</button></div>
+        <pre class="code-block-content"><code>${escaped}</code></pre></div>`;
+    });
+    return html;
+  }
+
+  function App() {
+    const [chats, setChats] = useState(() => {
+      try {
+        const saved = localStorage.getItem(STORAGE('chats'));
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch(e) {}
+      return [{ id: '1', title: 'Новый чат', model: APP_CONFIG.api.defaultModel, messages: [] }];
+    });
+    
+    const [activeChat, setActiveChat] = useState(chats[0]?.id || '1');
+    const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth > 767);
+    const [showModels, setShowModels] = useState(false);
+    const [showProfile, setShowProfile] = useState(false);
+    const [subscription, setSubscription] = useState(() => localStorage.getItem(STORAGE('sub')) || 'free');
+    const [theme, setTheme] = useState(() => localStorage.getItem(STORAGE('theme')) || 'default');
+    const [isLoading, setIsLoading] = useState(false);
+    const [attachments, setAttachments] = useState([]);
+    const [modelCategory, setModelCategory] = useState('all');
+    const [apiError, setApiError] = useState(null);
+    
+    const fileInputRef = useRef(null);
+    const messagesEndRef = useRef(null);
+    const textareaRef = useRef(null);
+    const abortControllerRef = useRef(null);
+
+    const currentChat = chats.find(c => c.id === activeChat) || chats[0];
+    const currentModel = APP_CONFIG.api.models[currentChat?.model];
+
+    useEffect(() => { 
+      if (chats?.length > 0) {
+        try { localStorage.setItem(STORAGE('chats'), JSON.stringify(chats)); } catch(e) {}
+      }
+    }, [chats]);
+    useEffect(() => { localStorage.setItem(STORAGE('sub'), subscription); }, [subscription]);
+    useEffect(() => {
+      localStorage.setItem(STORAGE('theme'), theme);
+      document.body.style.background = (themes[theme] || themes.default).bg;
+    }, [theme]);
+    useEffect(() => { 
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, [currentChat?.messages]);
+
+    useEffect(() => {
+      document.querySelectorAll('.code-copy-btn').forEach(btn => {
+        if (!btn.hasListener) {
+          btn.hasListener = true;
+          btn.addEventListener('click', function() {
+            const code = decodeURIComponent(this.dataset.code);
+            navigator.clipboard.writeText(code).then(() => {
+              this.textContent = '✓';
+              this.classList.add('copied');
+              setTimeout(() => { this.textContent = 'Копировать'; this.classList.remove('copied'); }, 2000);
+            }).catch(() => {
+              this.textContent = 'Ошибка';
+              setTimeout(() => { this.textContent = 'Копировать'; }, 2000);
+            });
+          });
+        }
+      });
+    }, [currentChat?.messages]);
+
+    const addMessage = useCallback((chatId, role, content, files = []) => {
+      setChats(prev => prev.map(c => {
+        if (c.id === chatId) {
+          const newMsg = { 
+            role, content: content || '', 
+            id: Date.now() + Math.random(), 
+            timestamp: new Date().toISOString(),
+            files: files.map(f => ({ name: f.name, size: f.size, type: f.type, url: f.url }))
+          };
+          const title = c.messages.length === 0 && c.title === 'Новый чат' ? 
+            (content?.slice(0, 30) || files[0]?.name || 'Чат') : c.title;
+          return { ...c, messages: [...c.messages, newMsg], title };
+        }
+        return c;
+      }));
+    }, []);
+
+    const handleFileSelect = async (e) => {
+      const files = Array.from(e.target.files);
+      const newAttachments = [];
+      
+      for (const file of files) {
+        if (file.size > APP_CONFIG.maxFileSize) {
+          alert(`❌ ${file.name} слишком большой (${formatFileSize(file.size)}). Максимум 10 МБ`);
+          continue;
+        }
+        
+        try {
+          const dataUrl = file.type.startsWith('image/') ? await readFileAsDataURL(file) : null;
+          let textContent = null;
+          
+          if (isReadableFile(file.name) && !file.type.startsWith('image/')) {
+            try {
+              textContent = await readFileContent(file);
+            } catch(err) {
+              console.warn('Could not read file:', file.name);
+            }
+          }
+          
+          newAttachments.push({
+            name: file.name,
+            size: file.size,
+            type: file.type,
+            url: dataUrl,
+            textContent: textContent
+          });
+        } catch(err) {
+          console.error('Error processing file:', file.name, err);
+        }
+      }
+      
+      if (newAttachments.length > 0) {
+        setAttachments(prev => [...prev, ...newAttachments]);
+      }
+      
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    };
+
+    const removeAttachment = (index) => {
+      setAttachments(prev => prev.filter((_, i) => i !== index));
+    };
+
+    const sendMessage = async (text) => {
+      if (isLoading) return;
+      if (!text.trim() && attachments.length === 0) return;
+      
+      const chatId = activeChat;
+      const chat = chats.find(c => c.id === chatId);
+      if (!chat) return;
+      
+      setApiError(null);
+      
+      // Build message with file contents
+      let fullMessage = text.trim();
+      
+      if (attachments.length > 0) {
+        const fileContents = [];
+        
+        for (const att of attachments) {
+          if (att.textContent && isReadableFile(att.name)) {
+            const ext = getFileExtension(att.name);
+            fileContents.push(`\`\`\`${ext}\n// Файл: ${att.name}\n${att.textContent}\n\`\`\``);
+          } else if (att.type?.startsWith('image/')) {
+            fileContents.push(`[Прикреплено изображение: ${att.name}]`);
+          } else {
+            fileContents.push(`[Прикреплен файл: ${att.name} (${formatFileSize(att.size)})]`);
+          }
+        }
+        
+        const fileSection = fileContents.join('\n\n');
+        fullMessage = fullMessage 
+          ? `${fullMessage}\n\n--- Прикрепленные файлы ---\n${fileSection}`
+          : `Вот мои файлы:\n\n${fileSection}`;
+      }
+      
+      // Add user message
+      addMessage(chatId, 'user', text.trim(), attachments);
+      setAttachments([]);
+      if (textareaRef.current) textareaRef.current.value = '';
+      
+      setIsLoading(true);
+      
+      // Cancel previous request if any
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+      abortControllerRef.current = new AbortController();
+      
+      try {
+        const messagesToSend = [...chat.messages, { role: 'user', content: fullMessage }]
+          .map(m => ({ role: m.role, content: m.content }));
+        
+        console.log('Sending request to:', APP_CONFIG.api.url);
+        console.log('Model:', chat.model);
+        console.log('Messages count:', messagesToSend.length);
+        
+        const res = await fetch(APP_CONFIG.api.url, {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json', 
+            'Authorization': `Bearer ${APP_CONFIG.api.token}` 
+          },
+          body: JSON.stringify({ 
+            model: chat.model, 
+            messages: messagesToSend, 
+            max_tokens: 4096,
+            temperature: 0.7
+          }),
+          signal: abortControllerRef.current.signal
+        });
+        
+        console.log('Response status:', res.status);
+        
+        if (!res.ok) {
+          const errorText = await res.text();
+          console.error('API Error Response:', errorText);
+          throw new Error(`HTTP ${res.status}: ${errorText.substring(0, 200)}`);
+        }
+        
+        const data = await res.json();
+        console.log('Response data:', data);
+        
+        const reply = data.choices?.[0]?.message?.content;
+        if (!reply) {
+          throw new Error('Пустой ответ от API. Проверьте структуру ответа.');
+        }
+        
+        addMessage(chatId, 'assistant', reply);
+      } catch (e) {
+        console.error('Full error:', e);
+        
+        if (e.name === 'AbortError') {
+          console.log('Request was cancelled');
+          return;
+        }
+        
+        let errorMsg = 'Ошибка соединения с API. ';
+        
+        if (e.message.includes('Failed to fetch') || e.message.includes('NetworkError')) {
+          errorMsg += 'Проверьте подключение к интернету или API может быть недоступен. Попробуйте позже или используйте другую модель.';
+          setApiError('Сервер API недоступен. Попробуйте другую модель или проверьте подключение.');
+        } else if (e.message.includes('HTTP 401') || e.message.includes('HTTP 403')) {
+          errorMsg += 'Ошибка авторизации. Возможно, API ключ недействителен.';
+          setApiError('Ошибка авторизации API. Проверьте ключ.');
+        } else if (e.message.includes('HTTP 429')) {
+          errorMsg += 'Слишком много запросов. Подождите немного.';
+          setApiError('Превышен лимит запросов. Подождите 30 секунд.');
+        } else {
+          errorMsg += e.message;
+          setApiError(e.message);
+        }
+        
+        addMessage(chatId, 'assistant', `⚠️ ${errorMsg}\n\nПопробуйте:\n• Выбрать другую модель\n• Отправить сообщение короче\n• Проверить интернет-соединение`);
+      } finally {
+        setIsLoading(false);
+        abortControllerRef.current = null;
+      }
+    };
+
+    const newChat = () => {
+      const id = Date.now().toString();
+      setChats(prev => [{ id, title: 'Новый чат', model: APP_CONFIG.api.defaultModel, messages: [] }, ...prev]);
+      setActiveChat(id);
+      setApiError(null);
+      if (window.innerWidth <= 767) setSidebarOpen(false);
+    };
+
+    const filteredModels = Object.entries(APP_CONFIG.api.models)
+      .filter(([_, m]) => modelCategory === 'all' || m.category === modelCategory);
+
+    const renderMsgFiles = (files) => {
+      if (!files?.length) return null;
+      return React.createElement('div', { className: 'msg-files' },
+        files.map((file, i) => {
+          if (file.type?.startsWith('image/') && file.url) {
+            return React.createElement('img', { 
+              key: i, src: file.url, className: 'msg-image', 
+              onClick: () => window.open(file.url, '_blank'),
+              alt: file.name
+            });
+          }
+          return React.createElement('div', { key: i, className: 'msg-file' },
+            React.createElement('span', null, '📄'),
+            React.createElement('div', { style: { flex: 1 } },
+              React.createElement('div', { style: { fontSize: 13, fontWeight: 500 } }, file.name),
+              React.createElement('div', { style: { fontSize: 11, color: 'var(--text3)' } }, formatFileSize(file.size))
+            )
+          );
+        })
+      );
+    };
+
+    return React.createElement('div', { style: { display: 'flex', height: '100%', width: '100%' } },
+      React.createElement('div', { className: `overlay ${sidebarOpen ? 'open' : ''}`, onClick: () => setSidebarOpen(false) }),
+      
+      // SIDEBAR
+      React.createElement('div', { className: `sidebar ${sidebarOpen ? 'open' : ''}` },
+        React.createElement('div', { className: 'sidebar-header' },
+          React.createElement('span', { className: 'logo' }, '✨ Delix Assis'),
+          React.createElement('button', { className: 'btn-icon', onClick: () => setSidebarOpen(false) }, '✕')
+        ),
+        React.createElement('button', { className: 'new-chat-btn', onClick: newChat }, '＋ Новый чат'),
+        React.createElement('div', { className: 'chat-list' },
+          chats.map(c => React.createElement('div', { 
+            key: c.id, className: `chat-item ${activeChat === c.id ? 'active' : ''}`,
+            onClick: () => { setActiveChat(c.id); setApiError(null); if(window.innerWidth<=767) setSidebarOpen(false); }
+          },
+            React.createElement('span', { style: { marginRight: 6 } }, APP_CONFIG.api.models[c.model]?.icon || '💬'),
+            React.createElement('span', { className: 'chat-item-title' }, c.title || 'Чат'),
+            React.createElement('button', { 
+              className: 'btn-icon', style: { width: 22, height: 22, fontSize: 11, opacity: 0.4 },
+              onClick: (e) => { 
+                e.stopPropagation();
+                setChats(prev => {
+                  const next = prev.filter(x => x.id !== c.id);
+                  if (next.length === 0) return [{ id: Date.now().toString(), title: 'Новый чат', model: APP_CONFIG.api.defaultModel, messages: [] }];
+                  if (activeChat === c.id) setActiveChat(next[0].id);
+                  return next;
+                });
+              }
+            }, '🗑️')
+          ))
+        ),
+        React.createElement('div', { style: { padding: '12px', borderTop: '1px solid var(--border)', display: 'flex', gap: 8 } },
+          React.createElement('button', { className: 'btn-icon', onClick: () => setShowProfile(true), style: { flex: 1, borderRadius: '2rem', fontSize: 13 } }, '👤 Профиль'),
+          React.createElement('button', { className: 'btn-icon', onClick: () => setShowModels(true), style: { flex: 1, borderRadius: '2rem', fontSize: 13 } }, '🤖 Модели')
+        )
+      ),
+
+      // MAIN CHAT
+      React.createElement('div', { className: 'main-chat' },
+        React.createElement('div', { className: 'header' },
+          React.createElement('button', { className: 'btn-icon', onClick: () => setSidebarOpen(!sidebarOpen) }, '☰'),
+          React.createElement('div', { className: 'model-selector', onClick: () => setShowModels(true) },
+            React.createElement('span', null, currentModel?.icon || '🤖'),
+            React.createElement('span', { style: { fontWeight: 500, fontSize: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } }, currentModel?.name || 'Модель'),
+            subscription === 'pro' && React.createElement('span', { className: 'badge pro-badge' }, 'PRO')
+          ),
+          React.createElement('div', { style: { marginLeft: 'auto' } }),
+          React.createElement('button', { className: 'btn-icon', onClick: () => {
+            if (abortControllerRef.current) abortControllerRef.current.abort();
+            setIsLoading(false);
+            setChats(prev => prev.map(c => c.id === activeChat ? {...c, messages: [], title: 'Очищен'} : c));
+            setApiError(null);
+          }}, '🗑️')
+        ),
+        
+        apiError && React.createElement('div', { className: 'error-banner', style: { margin: '8px 16px 0' } },
+          React.createElement('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' } },
+            React.createElement('span', null, '⚠️ ', apiError),
+            React.createElement('button', { 
+              className: 'btn-icon', 
+              style: { width: 24, height: 24, fontSize: 12 },
+              onClick: () => setApiError(null)
+            }, '✕')
+          )
+        ),
+        
+        React.createElement('div', { className: 'messages' },
+          currentChat?.messages?.map(m => React.createElement('div', { key: m.id, className: `msg ${m.role}` },
+            React.createElement('div', { className: 'avatar' }, m.role === 'user' ? '👤' : currentModel?.icon || '🤖'),
+            React.createElement('div', { style: { flex: 1, minWidth: 0 } },
+              React.createElement('div', { className: 'msg-bubble' },
+                renderMsgFiles(m.files),
+                m.content && React.createElement('div', { dangerouslySetInnerHTML: { __html: formatText(m.content) } })
+              )
+            )
+          )),
+          isLoading && React.createElement('div', { className: 'msg assistant' },
+            React.createElement('div', { className: 'avatar' }, '🤖'),
+            React.createElement('div', { className: 'msg-bubble' },
+              React.createElement('div', { className: 'typing' }, React.createElement('span', null), React.createElement('span', null), React.createElement('span', null))
+            )
+          ),
+          React.createElement('div', { ref: messagesEndRef })
+        ),
+        
+        React.createElement('div', { className: 'input-area' },
+          attachments.length > 0 && React.createElement('div', { className: 'attachments-preview' },
+            attachments.map((att, i) => React.createElement('div', { key: i, className: 'attachment-item' },
+              att.type?.startsWith('image/') && att.url ? React.createElement('img', { src: att.url }) : React.createElement('span', null, isReadableFile(att.name) ? '📝' : '📄'),
+              React.createElement('span', { style: { flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } }, att.name),
+              React.createElement('button', { className: 'attachment-remove', onClick: () => removeAttachment(i) }, '✕')
+            ))
+          ),
+          React.createElement('div', { className: 'input-row' },
+            React.createElement('button', { className: 'attach-btn', onClick: () => fileInputRef.current?.click(), title: 'Прикрепить файлы' }, '📎'),
+            React.createElement('input', { 
+              ref: fileInputRef, type: 'file', multiple: true, onChange: handleFileSelect, style: { display: 'none' },
+              accept: 'image/*,.txt,.html,.htm,.css,.js,.jsx,.ts,.tsx,.json,.xml,.md,.py,.java,.cpp,.c,.h,.php,.rb,.go,.rs,.sql,.yaml,.yml,.toml,.ini,.cfg,.log,.csv,.svg,.pdf,.doc,.docx'
+            }),
+            React.createElement('div', { className: 'input-wrap' },
+              React.createElement('textarea', {
+                ref: textareaRef, rows: '1',
+                placeholder: attachments.length > 0 ? 'Опишите, что сделать с файлами...' : 'Введите сообщение...',
+                disabled: isLoading,
+                onKeyDown: (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(e.target.value); } }
+              })
+            ),
+            React.createElement('button', { 
+              className: 'send-btn', disabled: isLoading,
+              onClick: () => { const t = textareaRef.current; if(t) sendMessage(t.value); }
+            }, '➤')
+          )
+        )
+      ),
+
+      // MODELS MODAL
+      showModels && React.createElement('div', { className: 'modal', onClick: () => setShowModels(false) },
+        React.createElement('div', { className: 'modal-content', onClick: e => e.stopPropagation() },
+          React.createElement('div', { style: { display: 'flex', justifyContent: 'space-between', marginBottom: 12 } },
+            React.createElement('h3', null, '🤖 Модели'),
+            React.createElement('button', { className: 'btn-icon', onClick: () => setShowModels(false) }, '✕')
+          ),
+          React.createElement('div', { className: 'category-tabs' },
+            React.createElement('button', { className: `category-tab ${modelCategory === 'all' ? 'active' : ''}`, onClick: () => setModelCategory('all') }, 'Все'),
+            Object.entries(APP_CONFIG.api.categories).map(([k, cat]) => 
+              React.createElement('button', { key: k, className: `category-tab ${modelCategory === k ? 'active' : ''}`, onClick: () => setModelCategory(k) }, `${cat.icon} ${cat.name}`)
+            )
+          ),
+          React.createElement('div', { style: { display: 'flex', flexDirection: 'column', gap: 6, maxHeight: '50vh', overflowY: 'auto' } },
+            filteredModels.map(([key, m]) => React.createElement('div', {
+              key, onClick: () => { setChats(prev => prev.map(c => c.id === activeChat ? {...c, model: key} : c)); setShowModels(false); setApiError(null); },
+              style: { padding: 10, borderRadius: '0.75rem', cursor: 'pointer', background: currentChat?.model === key ? 'var(--surface2)' : 'transparent', border: `1px solid ${currentChat?.model === key ? 'var(--accent)' : 'var(--border)'}`, display: 'flex', alignItems: 'center', gap: 10 }
+            },
+              React.createElement('span', { style: { fontSize: 22 } }, m.icon),
+              React.createElement('div', { style: { flex: 1 } },
+                React.createElement('div', { style: { display: 'flex', alignItems: 'center', gap: 6 } },
+                  React.createElement('span', { style: { fontWeight: 600, fontSize: 13 } }, m.name),
+                  React.createElement('span', { className: `model-category-badge category-${m.category}` }, APP_CONFIG.api.categories[m.category]?.name)
+                ),
+                React.createElement('div', { style: { fontSize: 11, color: 'var(--text3)' } }, m.developer),
+                React.createElement('div', { style: { fontSize: 11, color: 'var(--text2)' } }, m.description)
+              ),
+              currentChat?.model === key && React.createElement('span', { style: { color: 'var(--accent)', fontSize: 18 } }, '✓')
+            ))
+          )
+        )
+      ),
+
+      // PROFILE MODAL
+      showProfile && React.createElement('div', { className: 'modal', onClick: () => setShowProfile(false) },
+        React.createElement('div', { className: 'modal-content', onClick: e => e.stopPropagation() },
+          React.createElement('div', { style: { display: 'flex', justifyContent: 'space-between', marginBottom: 16 } },
+            React.createElement('h3', null, '👤 Профиль'),
+            React.createElement('button', { className: 'btn-icon', onClick: () => setShowProfile(false) }, '✕')
+          ),
+          React.createElement('div', { style: { padding: 16, borderRadius: '1rem', marginBottom: 16, background: subscription === 'pro' ? 'linear-gradient(135deg, rgba(245,158,11,0.2), rgba(239,68,68,0.2))' : 'var(--surface2)', border: '1px solid var(--border)' } },
+            React.createElement('div', { style: { display: 'flex', justifyContent: 'space-between', marginBottom: 8 } },
+              React.createElement('span', { style: { fontWeight: 600, fontSize: 16 } }, subscription === 'pro' ? '⚡ Delix Pro' : 'Бесплатно'),
+              subscription === 'pro' && React.createElement('span', { className: 'badge pro-badge' }, 'PRO')
+            ),
+            React.createElement('div', { style: { fontSize: 13, color: 'var(--text2)', marginBottom: 12, whiteSpace: 'pre-wrap' } },
+              subscription === 'pro' ? '✓ Все модели\n✓ Анализ файлов\n✓ Приоритет' : '• Базовые модели\n• Анализ файлов'
+            ),
+            React.createElement('button', { onClick: () => setSubscription(subscription === 'pro' ? 'free' : 'pro'),
+              style: { width: '100%', padding: 10, background: subscription === 'pro' ? '#ef4444' : 'var(--accent)', border: 'none', color: 'white', borderRadius: '2rem', cursor: 'pointer', fontWeight: 600 }
+            }, subscription === 'pro' ? 'Отменить Pro' : 'Pro — 499₽/мес')
+          ),
+          React.createElement('div', null,
+            React.createElement('div', { style: { fontWeight: 600, marginBottom: 8 } }, '🎨 Тема'),
+            React.createElement('div', { className: 'theme-grid' },
+              Object.entries(themes).map(([k, t]) => React.createElement('div', { key: k, className: `theme-dot ${theme === k ? 'active' : ''}`, onClick: () => setTheme(k),
+                style: { background: t.bg, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', padding: 4 }
+              }, React.createElement('span', { style: { fontSize: 9, color: 'white' } }, t.name)))
+            )
+          ),
+          React.createElement('div', { style: { textAlign: 'center', marginTop: 16, fontSize: 11, color: 'var(--text3)' } }, 
+            `Delix Assis v3.3 • ${chats.reduce((s,c) => s + c.messages.length, 0)} сообщений`
+          )
+        )
+      )
+    );
+  }
+
+  ReactDOM.createRoot(document.getElementById('app')).render(React.createElement(App));
+</script>
+</body>
+</html>
