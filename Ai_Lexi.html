@@ -2,51 +2,80 @@
 <html lang="ru" translate="no">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="theme-color" content="#000000">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0a0a0f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
   <title>Lexi AI - Виртуальные собеседники</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🤖</text></svg>">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     :root {
-      --accent: #4da3ff;
-      --accent2: #1e6fff;
-      --accent3: #ff4d8d;
-      --bg: #000000;
-      --text: rgba(255,255,255,.92);
-      --muted: rgba(255,255,255,.65);
-      --stroke: rgba(255,255,255,.12);
-      --shadow: 0 20px 60px rgba(0,0,0,.55);
-      --radius: 12px;
-      --radius2: 26px;
-      --container: 1120px;
+      --accent: #7c3aed;
+      --accent-light: #8b5cf6;
+      --accent-glow: rgba(124, 58, 237, 0.4);
+      --accent2: #3b82f6;
+      --accent3: #ec4899;
+      --bg: #0a0a0f;
+      --bg-card: rgba(15, 15, 25, 0.8);
+      --bg-elevated: rgba(20, 20, 35, 0.95);
+      --text: rgba(255, 255, 255, 0.95);
+      --text-secondary: rgba(255, 255, 255, 0.6);
+      --text-muted: rgba(255, 255, 255, 0.4);
+      --border: rgba(255, 255, 255, 0.08);
+      --border-active: rgba(124, 58, 237, 0.5);
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+      --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
+      --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.5);
+      --radius-sm: 10px;
+      --radius-md: 16px;
+      --radius-lg: 24px;
+      --radius-full: 9999px;
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-top: env(safe-area-inset-top, 0px);
     }
 
     body.light-theme {
-      --bg: #f0f2f5;
-      --text: rgba(0,0,0,.88);
-      --muted: rgba(0,0,0,.55);
-      --stroke: rgba(0,0,0,.12);
+      --bg: #f8fafc;
+      --bg-card: rgba(255, 255, 255, 0.9);
+      --bg-elevated: rgba(255, 255, 255, 0.95);
+      --text: rgba(15, 23, 42, 0.95);
+      --text-secondary: rgba(15, 23, 42, 0.6);
+      --text-muted: rgba(15, 23, 42, 0.4);
+      --border: rgba(15, 23, 42, 0.1);
+      --border-active: rgba(124, 58, 237, 0.4);
     }
 
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Arial;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-user-select: none;
+      user-select: none;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    }
+
+    input, textarea {
+      -webkit-user-select: text;
+      user-select: text;
     }
 
     html, body {
       height: 100%;
+      overflow: hidden;
+      position: fixed;
+      width: 100%;
     }
 
     body {
-      margin: 0;
       color: var(--text);
       background: var(--bg);
-      overflow-x: hidden;
-      line-height: 1.6;
+      line-height: 1.5;
       transition: background 0.3s ease, color 0.3s ease;
+      overscroll-behavior: none;
+      -webkit-overflow-scrolling: touch;
     }
 
     .bg {
@@ -54,266 +83,99 @@
       inset: 0;
       z-index: 0;
       pointer-events: none;
-      background:
-        radial-gradient(900px 420px at 18% 10%, color-mix(in srgb, var(--accent), transparent 72%), transparent 60%),
-        radial-gradient(820px 420px at 85% 18%, color-mix(in srgb, var(--accent2), transparent 78%), transparent 62%),
-        radial-gradient(760px 420px at 55% 80%, rgba(77,163,255,.14), transparent 65%);
-      animation: bgPulse 10s ease-in-out infinite;
-    }
-
-    body.light-theme .bg {
-      opacity: 0.4;
-    }
-
-    @keyframes bgPulse {
-      0%,100%{ filter: saturate(1) brightness(1); }
-      50%{ filter: saturate(1.05) brightness(1.02); }
-    }
-
-    .bg-grid {
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      pointer-events: none;
-      opacity: .45;
-      background:
-        linear-gradient(to right, rgba(77,163,255,.10) 1px, transparent 1px) 0 0/72px 72px,
-        linear-gradient(to bottom, rgba(77,163,255,.08) 1px, transparent 1px) 0 0/72px 72px;
-      mask-image: radial-gradient(closest-side, rgba(0,0,0,.9), transparent 92%);
-      animation: gridDrift 24s linear infinite;
-    }
-
-    @keyframes gridDrift {
-      from{ background-position: 0 0, 0 0; }
-      to{ background-position: 180px 120px, 120px 180px; }
-    }
-
-    .blob {
-      position: fixed;
-      width: 520px;
-      height: 520px;
-      border-radius: 999px;
-      filter: blur(70px);
-      opacity: .18;
-      z-index: 0;
-      pointer-events: none;
-      animation: float 12s ease-in-out infinite;
-    }
-
-    .blob.b1 { top:-180px; left:-180px; background: var(--accent); }
-    .blob.b2 { top:-160px; right:-200px; opacity:.13; animation-duration: 14s; background: var(--accent2); }
-    .blob.b3 { bottom:-240px; left:35%; opacity:.10; animation-duration: 16s; background: rgba(255,255,255,.18); }
-
-    @keyframes float {
-      0%,100%{ transform: translate3d(0,0,0) scale(1); }
-      50%{ transform: translate3d(0,18px,0) scale(1.03); }
-    }
-
-    .particles {
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      pointer-events: none;
-      opacity: .35;
-      background:
-        radial-gradient(circle at 10% 30%, rgba(77,163,255,.22) 0 2px, transparent 3px),
-        radial-gradient(circle at 25% 70%, rgba(255,255,255,.20) 0 2px, transparent 3px),
-        radial-gradient(circle at 55% 25%, rgba(77,163,255,.18) 0 2px, transparent 3px),
-        radial-gradient(circle at 70% 60%, rgba(255,255,255,.16) 0 2px, transparent 3px),
-        radial-gradient(circle at 85% 40%, rgba(77,163,255,.20) 0 2px, transparent 3px);
-      animation: particles 18s linear infinite;
-    }
-
-    @keyframes particles {
-      from{ transform: translateY(0); }
-      to{ transform: translateY(40px); }
-    }
-
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
-
-    .container {
-      width: min(var(--container), calc(100% - 32px));
-      margin: 0 auto;
-    }
-
-    .nav-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 80;
-      pointer-events: none;
-      opacity: 0;
-      background: rgba(0,0,0,.22);
-      transition: opacity .25s ease;
-    }
-
-    body.navfx .nav-overlay {
-      opacity: 1;
-    }
-
-    body.navfx .app-container {
-      filter: blur(8px);
-      transform: scale(.995);
-      opacity: .88;
-    }
-
-    .toast {
-      position: fixed;
-      left: 50%;
-      bottom: 22px;
-      transform: translateX(-50%) translateY(10px);
-      z-index: 120;
-      opacity: 0;
-      pointer-events: none;
-      padding: 12px 20px;
-      border-radius: 999px;
-      border: 1px solid rgba(77,163,255,.45);
-      background: rgba(0,0,0,.72);
-      color: var(--text);
-      font-weight: 900;
-      font-size: 13px;
-      box-shadow: 0 18px 60px rgba(0,0,0,.55);
-      transition: opacity .2s ease, transform .2s ease;
-      backdrop-filter: blur(10px);
-    }
-
-    body.light-theme .toast {
-      background: rgba(255,255,255,.95);
-      color: #000;
-    }
-
-    .toast.show {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
+      background: 
+        radial-gradient(ellipse at 20% 50%, rgba(124, 58, 237, 0.15) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 80%, rgba(236, 72, 153, 0.08) 0%, transparent 50%);
     }
 
     .app-container {
       position: relative;
       z-index: 1;
       display: flex;
-      min-height: 100vh;
-      max-width: 1400px;
-      margin: 0 auto;
+      height: 100vh;
+      height: 100dvh;
+      max-width: 100%;
       background: transparent;
-      transition: filter .25s ease, transform .25s ease, opacity .25s ease;
+      overflow: hidden;
     }
 
+    /* Сайдбар */
     .sidebar {
       width: 320px;
       min-width: 320px;
-      background: rgba(0,0,0,.55);
-      backdrop-filter: blur(14px);
-      border-right: 1px solid var(--stroke);
+      background: var(--bg-card);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-right: 1px solid var(--border);
       display: flex;
       flex-direction: column;
-      transition: all 0.3s ease;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       z-index: 100;
-      height: 100vh;
-      position: sticky;
-      top: 0;
-    }
-
-    body.light-theme .sidebar {
-      background: rgba(255,255,255,.85);
+      height: 100%;
     }
 
     .sidebar-header {
-      padding: 25px;
-      border-bottom: 1px solid var(--stroke);
+      padding: calc(20px + var(--safe-top)) 20px 20px;
+      border-bottom: 1px solid var(--border);
     }
 
     .logo {
       display: flex;
       align-items: center;
       gap: 12px;
-      font-weight: 900;
-      letter-spacing: .6px;
-      font-size: 18px;
-      text-transform: uppercase;
+      font-weight: 800;
+      font-size: 20px;
       color: var(--text);
       cursor: pointer;
+      letter-spacing: -0.5px;
     }
 
     .logo-icon {
-      width: 38px;
-      height: 38px;
-      border-radius: 12px;
-      background: #0b0b10;
-      border: 1px solid rgba(255,255,255,.14);
-      position: relative;
-      overflow: hidden;
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
       display: flex;
       align-items: center;
       justify-content: center;
-    }
-
-    .logo-icon:after {
-      content:"";
-      position:absolute;
-      inset:-40%;
-      background: conic-gradient(from 180deg,
-        rgba(255,255,255,.10),
-        rgba(77,163,255,.55),
-        rgba(255,255,255,.12),
-        rgba(30,111,255,.50));
-      animation: spin 6s linear infinite;
-    }
-
-    .logo-icon:before {
-      content:"";
-      position:absolute;
-      inset:0;
-      border-radius: 12px;
-      box-shadow: 0 0 0 0 rgba(77,163,255,.0);
-      animation: logoGlow 2.8s ease-in-out infinite;
-    }
-
-    @keyframes spin { to{ transform: rotate(360deg); } }
-    @keyframes logoGlow {
-      0%,100%{ box-shadow: 0 0 0 0 rgba(77,163,255,0); }
-      50%{ box-shadow: 0 0 0 6px rgba(77,163,255,.12); }
-    }
-
-    .logo span {
-      position: relative;
-      z-index: 1;
+      font-size: 22px;
+      box-shadow: 0 4px 12px var(--accent-glow);
     }
 
     .user-profile {
       display: flex;
       align-items: center;
-      gap: 15px;
-      padding: 20px;
-      background: rgba(255,255,255,.04);
-      margin: 15px;
-      border-radius: 15px;
-      border: 1px solid var(--stroke);
+      gap: 12px;
+      padding: 16px;
+      background: var(--bg-elevated);
+      margin: 12px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
       cursor: pointer;
       transition: all 0.2s ease;
+      -webkit-tap-highlight-color: rgba(124, 58, 237, 0.2);
     }
 
-    .user-profile:hover {
-      transform: translateY(-2px);
-      border-color: rgba(77,163,255,.55);
-      background: rgba(77,163,255,.05);
+    .user-profile:active {
+      transform: scale(0.98);
+      background: rgba(124, 58, 237, 0.1);
     }
 
     .user-avatar {
-      width: 50px;
-      height: 50px;
+      width: 44px;
+      height: 44px;
       border-radius: 50%;
-      background: rgba(77,163,255,.2);
-      border: 1px solid rgba(77,163,255,.45);
+      background: linear-gradient(135deg, var(--accent), var(--accent3));
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: bold;
+      font-weight: 700;
       font-size: 18px;
       position: relative;
       overflow: hidden;
       flex-shrink: 0;
+      box-shadow: 0 2px 8px var(--accent-glow);
     }
 
     .user-avatar img {
@@ -329,8 +191,12 @@
 
     .user-name {
       font-weight: 600;
-      margin-bottom: 4px;
+      font-size: 15px;
       color: var(--text);
+      margin-bottom: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .user-status {
@@ -338,104 +204,93 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      flex-wrap: wrap;
+      color: var(--text-secondary);
     }
 
     .status-dot {
       width: 8px;
       height: 8px;
-      background: #28a745;
+      background: #22c55e;
       border-radius: 50%;
       animation: pulse 2s infinite;
+      box-shadow: 0 0 6px rgba(34, 197, 94, 0.5);
     }
 
     @keyframes pulse {
-      0%,100%{ opacity:1; }
-      50%{ opacity:0.5; }
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(1.1); }
     }
 
     .vip-badge {
-      background: linear-gradient(135deg, #ffd700, #ffa500);
+      background: linear-gradient(135deg, #f59e0b, #f97316);
       color: #000;
-      padding: 4px 12px;
-      border-radius: 20px;
+      padding: 3px 10px;
+      border-radius: var(--radius-full);
       font-size: 11px;
       font-weight: 700;
+      letter-spacing: 0.5px;
     }
 
     .vip-badge.active {
-      background: linear-gradient(135deg, #00ff88, #00d4ff);
+      background: linear-gradient(135deg, #10b981, #06b6d4);
     }
 
+    /* Список персонажей */
     .characters-list {
       flex: 1;
       overflow-y: auto;
-      padding: 15px;
-      scrollbar-width: thin;
-      scrollbar-color: var(--accent) var(--stroke);
-    }
-
-    .characters-list::-webkit-scrollbar {
-      width: 6px;
-    }
-    .characters-list::-webkit-scrollbar-track {
-      background: var(--stroke);
-      border-radius: 3px;
-    }
-    .characters-list::-webkit-scrollbar-thumb {
-      background: var(--accent);
-      border-radius: 3px;
+      padding: 12px;
+      -webkit-overflow-scrolling: touch;
+      scroll-behavior: smooth;
     }
 
     .section-title {
-      font-size: 12px;
+      font-size: 11px;
       text-transform: uppercase;
-      letter-spacing: 1px;
-      color: var(--muted);
-      margin-bottom: 15px;
-      padding-left: 10px;
+      letter-spacing: 1.5px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      padding: 0 8px;
       font-weight: 700;
     }
 
     .character-card {
-      background: rgba(255,255,255,.04);
-      border: 1px solid var(--stroke);
-      border-radius: 15px;
-      padding: 18px;
-      margin-bottom: 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      margin-bottom: 8px;
       cursor: pointer;
       transition: all 0.2s ease;
-      position: relative;
+      -webkit-tap-highlight-color: rgba(124, 58, 237, 0.2);
     }
 
-    .character-card:hover {
-      transform: translateY(-2px);
-      border-color: rgba(77,163,255,.55);
-      background: rgba(77,163,255,.05);
+    .character-card:active {
+      transform: scale(0.98);
     }
 
     .character-card.active {
-      border-color: rgba(77,163,255,.95);
-      background: rgba(77,163,255,.1);
+      border-color: var(--border-active);
+      background: rgba(124, 58, 237, 0.1);
+      box-shadow: 0 4px 12px var(--accent-glow);
     }
 
     .character-header {
       display: flex;
       align-items: center;
-      gap: 12px;
-      margin-bottom: 10px;
+      gap: 10px;
+      margin-bottom: 8px;
     }
 
     .character-avatar {
-      width: 45px;
-      height: 45px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
-      background: rgba(77,163,255,.2);
-      border: 1px solid rgba(77,163,255,.45);
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: bold;
+      font-weight: 700;
       font-size: 16px;
       position: relative;
       overflow: hidden;
@@ -450,101 +305,104 @@
 
     .avatar-upload-btn {
       position: absolute;
-      bottom: -5px;
-      right: -5px;
-      width: 22px;
-      height: 22px;
+      bottom: -2px;
+      right: -2px;
+      width: 20px;
+      height: 20px;
       background: var(--accent);
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       color: white;
-      font-size: 10px;
-      cursor: pointer;
+      font-size: 9px;
       border: 2px solid var(--bg);
       opacity: 0;
-      transition: opacity 0.2s ease;
+      transition: opacity 0.2s;
     }
 
-    .character-avatar:hover .avatar-upload-btn {
+    .character-avatar:active .avatar-upload-btn {
       opacity: 1;
     }
 
     .character-info {
       flex: 1;
+      min-width: 0;
     }
 
     .character-name {
       font-weight: 600;
+      font-size: 14px;
       color: var(--text);
     }
 
     .character-age {
-      font-size: 12px;
-      color: var(--muted);
+      font-size: 11px;
+      color: var(--text-muted);
     }
 
     .character-description {
-      font-size: 13px;
-      line-height: 1.4;
-      color: var(--muted);
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.3;
     }
 
     .character-status {
       position: absolute;
-      top: 15px;
-      right: 15px;
-      width: 10px;
-      height: 10px;
-      background: #28a745;
+      top: 14px;
+      right: 14px;
+      width: 8px;
+      height: 8px;
+      background: #22c55e;
       border-radius: 50%;
       border: 2px solid var(--bg);
+      box-shadow: 0 0 6px rgba(34, 197, 94, 0.4);
     }
 
+    /* Область чата */
     .chat-area {
       flex: 1;
       display: flex;
       flex-direction: column;
       background: transparent;
       min-width: 0;
+      position: relative;
     }
 
     .chat-header {
-      padding: 20px 25px;
-      background: rgba(0,0,0,.3);
-      backdrop-filter: blur(10px);
-      border-bottom: 1px solid var(--stroke);
+      padding: calc(12px + var(--safe-top)) 16px 12px;
+      background: var(--bg-card);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 15px;
-    }
-
-    body.light-theme .chat-header {
-      background: rgba(255,255,255,.7);
+      gap: 12px;
     }
 
     .current-character {
       display: flex;
       align-items: center;
-      gap: 15px;
+      gap: 10px;
       flex: 1;
+      min-width: 0;
+      cursor: pointer;
     }
 
     .current-character-avatar {
-      width: 50px;
-      height: 50px;
+      width: 42px;
+      height: 42px;
       border-radius: 50%;
-      background: rgba(77,163,255,.2);
-      border: 1px solid rgba(77,163,255,.45);
+      background: linear-gradient(135deg, var(--accent), var(--accent3));
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: bold;
+      font-weight: 700;
       font-size: 18px;
       position: relative;
       overflow: hidden;
+      flex-shrink: 0;
+      box-shadow: 0 2px 8px var(--accent-glow);
     }
 
     .current-character-avatar img {
@@ -555,120 +413,115 @@
 
     .character-details h3 {
       font-weight: 600;
-      margin-bottom: 4px;
+      font-size: 16px;
       color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .character-details p {
-      font-size: 14px;
-      color: var(--muted);
+      font-size: 12px;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .chat-actions {
       display: flex;
-      gap: 10px;
+      gap: 4px;
     }
 
     .action-btn {
-      width: 40px;
-      height: 40px;
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
-      background: rgba(255,255,255,.04);
-      border: 1px solid var(--stroke);
-      color: var(--text);
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.2s;
+      font-size: 15px;
+      -webkit-tap-highlight-color: rgba(124, 58, 237, 0.2);
     }
 
-    .action-btn:hover {
-      border-color: rgba(77,163,255,.55);
-      background: rgba(77,163,255,.1);
-      transform: translateY(-2px);
+    .action-btn:active {
+      background: rgba(124, 58, 237, 0.2);
+      color: var(--accent-light);
     }
 
+    /* Контейнер сообщений */
     .messages-container {
       flex: 1;
-      padding: 25px;
       overflow-y: auto;
+      padding: 16px;
       display: flex;
       flex-direction: column;
-      gap: 15px;
+      gap: 8px;
+      -webkit-overflow-scrolling: touch;
+      scroll-behavior: smooth;
       background: transparent;
-      scrollbar-width: thin;
-    }
-
-    .messages-container::-webkit-scrollbar {
-      width: 6px;
-    }
-    .messages-container::-webkit-scrollbar-track {
-      background: var(--stroke);
-      border-radius: 3px;
-    }
-    .messages-container::-webkit-scrollbar-thumb {
-      background: var(--accent);
-      border-radius: 3px;
     }
 
     .message {
-      max-width: 70%;
-      padding: 12px 18px;
-      border-radius: 20px;
+      max-width: 80%;
+      padding: 10px 14px;
+      border-radius: 18px;
       position: relative;
       animation: messageSlide 0.3s ease;
-      line-height: 1.5;
+      line-height: 1.4;
       word-wrap: break-word;
       font-size: 14px;
-      border: 1px solid var(--stroke);
     }
 
     @keyframes messageSlide {
-      from { opacity: 0; transform: translateY(20px); }
+      from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
     .message-incoming {
       align-self: flex-start;
-      background: rgba(255,255,255,.04);
-      border-bottom-left-radius: 5px;
+      background: var(--bg-card);
+      color: var(--text);
+      border-bottom-left-radius: 6px;
+      border: 1px solid var(--border);
     }
 
     .message-outgoing {
       align-self: flex-end;
-      background: linear-gradient(135deg, rgba(77,163,255,.8), rgba(30,111,255,.8));
-      border-bottom-right-radius: 5px;
-      border-color: rgba(77,163,255,.5);
-    }
-
-    body.light-theme .message-incoming {
-      background: rgba(0,0,0,.06);
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: white;
+      border-bottom-right-radius: 6px;
+      box-shadow: 0 2px 8px var(--accent-glow);
     }
 
     .message-time {
       font-size: 10px;
       opacity: 0.7;
-      margin-top: 5px;
+      margin-top: 4px;
       text-align: right;
     }
 
     .typing-indicator {
       display: flex;
       align-items: center;
-      gap: 5px;
-      padding: 12px 18px;
-      background: rgba(255,255,255,.04);
-      border-radius: 20px;
+      gap: 4px;
+      padding: 10px 14px;
+      background: var(--bg-card);
+      border-radius: 18px;
       align-self: flex-start;
-      border-bottom-left-radius: 5px;
-      border: 1px solid var(--stroke);
+      border-bottom-left-radius: 6px;
+      border: 1px solid var(--border);
     }
 
     .typing-dot {
-      width: 8px;
-      height: 8px;
-      background: var(--muted);
+      width: 7px;
+      height: 7px;
+      background: var(--text-muted);
       border-radius: 50%;
       animation: typing 1.4s infinite;
     }
@@ -676,34 +529,33 @@
     .typing-dot:nth-child(3) { animation-delay: 0.4s; }
 
     @keyframes typing {
-      0%,60%,100% { transform: translateY(0); }
-      30% { transform: translateY(-5px); }
+      0%, 60%, 100% { transform: translateY(0); }
+      30% { transform: translateY(-4px); }
     }
 
+    /* Область ввода */
     .input-area {
-      padding: 20px 25px;
-      background: rgba(0,0,0,.3);
-      backdrop-filter: blur(10px);
-      border-top: 1px solid var(--stroke);
-    }
-
-    body.light-theme .input-area {
-      background: rgba(255,255,255,.7);
+      padding: 12px 16px calc(12px + var(--safe-bottom));
+      background: var(--bg-card);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid var(--border);
     }
 
     .message-input-container {
       display: flex;
       align-items: center;
-      gap: 12px;
-      background: rgba(255,255,255,.04);
-      border: 1px solid var(--stroke);
-      border-radius: 999px;
-      padding: 5px 5px 5px 20px;
-      transition: all 0.2s ease;
+      gap: 8px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-full);
+      padding: 4px 4px 4px 16px;
+      transition: all 0.2s;
     }
 
     .message-input-container:focus-within {
-      border-color: rgba(77,163,255,.55);
+      border-color: var(--border-active);
+      box-shadow: 0 0 0 3px var(--accent-glow);
     }
 
     .message-input {
@@ -713,39 +565,41 @@
       color: var(--text);
       font-size: 15px;
       outline: none;
-      padding: 12px 0;
+      padding: 10px 0;
+      min-width: 0;
     }
 
     .message-input::placeholder {
-      color: var(--muted);
+      color: var(--text-muted);
     }
 
     .input-actions {
       display: flex;
-      gap: 5px;
+      gap: 2px;
     }
 
     .icon-btn {
-      width: 40px;
-      height: 40px;
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
       background: transparent;
       border: none;
-      color: var(--muted);
+      color: var(--text-secondary);
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      transition: all 0.2s ease;
+      font-size: 16px;
+      -webkit-tap-highlight-color: rgba(124, 58, 237, 0.2);
     }
 
-    .icon-btn:hover {
-      color: var(--accent);
+    .icon-btn:active {
+      color: var(--accent-light);
     }
 
     .send-btn {
-      width: 45px;
-      height: 45px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
       background: linear-gradient(135deg, var(--accent), var(--accent2));
       border: none;
@@ -754,52 +608,54 @@
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      transition: all 0.2s ease;
+      font-size: 16px;
+      transition: all 0.2s;
+      box-shadow: 0 2px 8px var(--accent-glow);
+      -webkit-tap-highlight-color: transparent;
     }
 
-    .send-btn:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 15px rgba(77,163,255,.5);
+    .send-btn:active {
+      transform: scale(0.95);
+      box-shadow: 0 4px 16px var(--accent-glow);
     }
 
     .send-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
+      opacity: 0.4;
+      box-shadow: none;
     }
 
+    /* Правая панель */
     .character-panel {
-      width: 300px;
-      min-width: 300px;
-      background: rgba(0,0,0,.3);
-      backdrop-filter: blur(10px);
-      border-left: 1px solid var(--stroke);
-      padding: 25px;
+      width: 280px;
+      min-width: 280px;
+      background: var(--bg-card);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-left: 1px solid var(--border);
+      padding: 20px;
       overflow-y: auto;
-    }
-
-    body.light-theme .character-panel {
-      background: rgba(255,255,255,.7);
+      -webkit-overflow-scrolling: touch;
     }
 
     .panel-header {
       text-align: center;
-      margin-bottom: 25px;
+      margin-bottom: 20px;
     }
 
     .panel-avatar {
-      width: 80px;
-      height: 80px;
+      width: 72px;
+      height: 72px;
       border-radius: 50%;
-      background: rgba(77,163,255,.2);
-      border: 1px solid rgba(77,163,255,.45);
+      background: linear-gradient(135deg, var(--accent), var(--accent3));
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: bold;
+      font-weight: 700;
       font-size: 24px;
       position: relative;
       overflow: hidden;
-      margin: 0 auto 15px;
+      margin: 0 auto 12px;
+      box-shadow: 0 4px 16px var(--accent-glow);
     }
 
     .panel-avatar img {
@@ -811,50 +667,45 @@
     .character-stats {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 15px;
-      margin-bottom: 25px;
+      gap: 10px;
+      margin-bottom: 20px;
     }
 
     .stat-card {
-      background: rgba(255,255,255,.04);
-      border: 1px solid var(--stroke);
-      border-radius: 12px;
-      padding: 15px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px;
       text-align: center;
-      transition: all 0.2s ease;
-    }
-
-    .stat-card:hover {
-      border-color: rgba(77,163,255,.55);
     }
 
     .stat-value {
-      font-size: 24px;
+      font-size: 22px;
       font-weight: 700;
-      color: var(--accent);
-      margin-bottom: 5px;
+      color: var(--accent-light);
+      margin-bottom: 2px;
     }
 
     .stat-label {
-      font-size: 11px;
-      color: var(--muted);
+      font-size: 10px;
+      color: var(--text-muted);
       text-transform: uppercase;
       letter-spacing: 1px;
       font-weight: 600;
     }
 
     .character-bio {
-      background: rgba(255,255,255,.04);
-      border: 1px solid var(--stroke);
-      border-radius: 15px;
-      padding: 20px;
-      margin-bottom: 20px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      margin-bottom: 16px;
     }
 
     .bio-title {
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 600;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
       display: flex;
       align-items: center;
       gap: 8px;
@@ -862,100 +713,104 @@
     }
 
     .bio-text {
-      font-size: 13px;
-      line-height: 1.6;
-      color: var(--muted);
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.5;
     }
 
     .vip-banner {
-      background: linear-gradient(135deg, rgba(255,215,0,.1), rgba(255,165,0,.05));
-      border: 1px solid rgba(255,215,0,.3);
-      border-radius: 15px;
-      padding: 20px;
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(249, 115, 22, 0.1));
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      border-radius: var(--radius-md);
+      padding: 16px;
       text-align: center;
-      margin-top: 20px;
     }
 
     .vip-banner.vip-active {
-      background: linear-gradient(135deg, rgba(0,255,136,.1), rgba(0,212,255,.05));
-      border-color: rgba(0,255,136,.3);
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(6, 182, 212, 0.1));
+      border-color: rgba(16, 185, 129, 0.3);
     }
 
     .vip-title {
       font-weight: 700;
-      margin-bottom: 8px;
+      font-size: 14px;
+      margin-bottom: 6px;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      gap: 6px;
+      color: var(--text);
     }
 
     .vip-text {
-      font-size: 12px;
-      opacity: 0.9;
-      margin-bottom: 12px;
+      font-size: 11px;
+      color: var(--text-secondary);
+      margin-bottom: 10px;
     }
 
     .vip-btn {
-      background: #000;
-      color: #ffd700;
+      background: rgba(0, 0, 0, 0.5);
+      color: #f59e0b;
       border: none;
-      padding: 10px 20px;
-      border-radius: 999px;
+      padding: 8px 20px;
+      border-radius: var(--radius-full);
       font-weight: 600;
+      font-size: 13px;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.2s;
+      -webkit-tap-highlight-color: transparent;
     }
 
-    .vip-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(0,0,0,.3);
+    .vip-btn:active {
+      transform: scale(0.95);
     }
 
+    /* Настройки */
     .settings-view {
       flex: 1;
       display: flex;
       flex-direction: column;
-      background: transparent;
       overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
     }
 
     .settings-container {
-      max-width: 600px;
+      max-width: 500px;
       margin: 0 auto;
       width: 100%;
+      padding-bottom: var(--safe-bottom);
     }
 
     .settings-header {
-      padding: 30px;
-      background: linear-gradient(135deg, rgba(77,163,255,.2), rgba(30,111,255,.1));
-      border-bottom: 1px solid var(--stroke);
+      padding: calc(20px + var(--safe-top)) 20px 20px;
+      background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(59, 130, 246, 0.1));
+      border-bottom: 1px solid var(--border);
       text-align: center;
     }
 
     .settings-profile {
       display: flex;
       align-items: center;
-      gap: 20px;
+      gap: 16px;
       flex-wrap: wrap;
       justify-content: center;
     }
 
     .profile-avatar-large {
-      width: 100px;
-      height: 100px;
+      width: 80px;
+      height: 80px;
       border-radius: 50%;
-      background: rgba(77,163,255,.2);
-      border: 2px solid var(--accent);
+      background: linear-gradient(135deg, var(--accent), var(--accent3));
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 32px;
-      font-weight: bold;
+      font-size: 28px;
+      font-weight: 700;
       position: relative;
       overflow: hidden;
-      cursor: pointer;
-      transition: all 0.2s ease;
+      border: 3px solid var(--border-active);
+      box-shadow: 0 4px 16px var(--accent-glow);
+      -webkit-tap-highlight-color: rgba(124, 58, 237, 0.2);
     }
 
     .profile-avatar-large img {
@@ -964,63 +819,78 @@
       object-fit: cover;
     }
 
-    .profile-avatar-large:hover::after {
+    .profile-avatar-large:active::after {
       content: '📷';
       position: absolute;
       inset: 0;
-      background: rgba(0,0,0,.7);
+      background: rgba(0, 0, 0, 0.7);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 24px;
+      font-size: 20px;
+    }
+
+    .profile-info h2 {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .profile-info p {
+      font-size: 13px;
+      color: var(--text-secondary);
     }
 
     .settings-sections {
-      padding: 30px;
+      padding: 16px;
     }
 
     .settings-section {
-      margin-bottom: 40px;
+      margin-bottom: 24px;
     }
 
     .settings-section-title {
-      font-size: 16px;
-      font-weight: 600;
-      margin-bottom: 20px;
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
       display: flex;
       align-items: center;
-      gap: 10px;
-      color: var(--text);
+      gap: 8px;
+      color: var(--text-muted);
     }
 
     .settings-item {
       display: flex;
       align-items: center;
-      padding: 20px;
-      background: rgba(255,255,255,.04);
-      border: 1px solid var(--stroke);
-      border-radius: 15px;
-      margin-bottom: 15px;
+      padding: 14px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      margin-bottom: 8px;
       cursor: pointer;
-      transition: all 0.2s ease;
-      gap: 20px;
+      gap: 12px;
+      transition: all 0.2s;
+      -webkit-tap-highlight-color: rgba(124, 58, 237, 0.2);
     }
 
-    .settings-item:hover {
-      border-color: rgba(77,163,255,.55);
-      background: rgba(77,163,255,.05);
-      transform: translateX(5px);
+    .settings-item:active {
+      background: rgba(124, 58, 237, 0.1);
+      border-color: var(--border-active);
     }
 
     .settings-icon {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-sm);
       background: linear-gradient(135deg, var(--accent), var(--accent2));
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 20px;
+      font-size: 16px;
+      color: white;
+      flex-shrink: 0;
     }
 
     .settings-content {
@@ -1028,197 +898,211 @@
     }
 
     .settings-content h3 {
-      margin: 0 0 5px 0;
-      font-size: 16px;
+      font-size: 14px;
       font-weight: 600;
       color: var(--text);
     }
 
     .settings-content p {
-      margin: 0;
-      font-size: 13px;
-      color: var(--muted);
+      font-size: 12px;
+      color: var(--text-secondary);
     }
 
     .settings-arrow {
-      color: var(--muted);
-      font-size: 20px;
+      color: var(--text-muted);
+      font-size: 18px;
     }
 
     .theme-switcher {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 15px;
-      margin-bottom: 20px;
+      gap: 10px;
     }
 
     .theme-option {
-      padding: 20px;
+      padding: 16px;
       text-align: center;
-      border: 2px solid var(--stroke);
-      border-radius: 15px;
+      border: 2px solid var(--border);
+      border-radius: var(--radius-md);
       cursor: pointer;
-      transition: all 0.2s ease;
-      background: rgba(255,255,255,.04);
+      transition: all 0.2s;
+      background: var(--bg-card);
+      -webkit-tap-highlight-color: rgba(124, 58, 237, 0.2);
+    }
+
+    .theme-option:active {
+      transform: scale(0.97);
     }
 
     .theme-option.active {
-      border-color: var(--accent);
-      background: rgba(77,163,255,.1);
+      border-color: var(--border-active);
+      background: rgba(124, 58, 237, 0.15);
     }
 
     .theme-option i {
-      font-size: 28px;
-      margin-bottom: 10px;
+      font-size: 24px;
+      margin-bottom: 8px;
       display: block;
     }
 
     .theme-name {
       font-weight: 600;
+      font-size: 13px;
       color: var(--text);
     }
 
+    /* Модальные окна */
     .modal-overlay {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,.85);
-      backdrop-filter: blur(8px);
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
       display: flex;
       justify-content: center;
-      align-items: center;
+      align-items: flex-end;
       z-index: 1000;
-      padding: 20px;
     }
 
     .modal {
-      background: rgba(0,0,0,.9);
-      border: 1px solid var(--stroke);
-      border-radius: 20px;
-      padding: 30px;
-      max-width: 500px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+      padding: 20px;
       width: 100%;
       max-height: 80vh;
       overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      box-shadow: var(--shadow-lg);
+      animation: slideUp 0.3s ease;
     }
 
-    body.light-theme .modal {
-      background: rgba(255,255,255,.95);
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
     }
 
     .modal-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
-      padding-bottom: 15px;
-      border-bottom: 1px solid var(--stroke);
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
     }
 
     .modal-header h3 {
-      font-size: 20px;
-      color: var(--accent);
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--accent-light);
     }
 
     .close-modal {
       background: none;
       border: none;
-      color: var(--muted);
+      color: var(--text-secondary);
       font-size: 24px;
       cursor: pointer;
-      width: 40px;
-      height: 40px;
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
+      -webkit-tap-highlight-color: rgba(124, 58, 237, 0.2);
     }
 
-    .close-modal:hover {
-      background: rgba(255,255,255,.1);
+    .close-modal:active {
+      background: rgba(255, 255, 255, 0.1);
     }
 
     .feature-item {
       display: flex;
       align-items: center;
-      gap: 15px;
-      padding: 15px;
-      margin-bottom: 10px;
-      background: rgba(255,255,255,.04);
-      border-radius: 10px;
-      border: 1px solid var(--stroke);
+      gap: 12px;
+      padding: 12px;
+      margin-bottom: 8px;
+      background: var(--bg-card);
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      font-size: 14px;
     }
 
     .feature-item i {
-      color: var(--accent);
+      color: var(--accent-light);
+      font-size: 16px;
     }
 
     .pricing-options {
       display: grid;
-      gap: 15px;
-      margin: 20px 0;
+      gap: 10px;
+      margin: 16px 0;
     }
 
     .price-option {
-      padding: 20px;
-      border: 2px solid var(--stroke);
-      border-radius: 15px;
+      padding: 14px;
+      border: 2px solid var(--border);
+      border-radius: var(--radius-md);
       text-align: center;
       cursor: pointer;
-      transition: all 0.2s ease;
-      background: rgba(255,255,255,.04);
+      transition: all 0.2s;
+      background: var(--bg-card);
+      -webkit-tap-highlight-color: rgba(124, 58, 237, 0.2);
+    }
+
+    .price-option:active {
+      transform: scale(0.97);
     }
 
     .price-option.active {
-      border-color: var(--accent);
-      background: rgba(77,163,255,.1);
+      border-color: var(--border-active);
+      background: rgba(124, 58, 237, 0.15);
     }
 
     .price-duration {
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 600;
-      margin-bottom: 5px;
       color: var(--text);
     }
 
     .price-amount {
-      font-size: 24px;
+      font-size: 22px;
       font-weight: 700;
-      color: var(--accent);
+      color: var(--accent-light);
     }
 
     .btn-group {
       display: flex;
-      gap: 15px;
-      margin-top: 20px;
+      gap: 10px;
+      margin-top: 16px;
     }
 
     .btn {
       flex: 1;
-      padding: 15px;
-      border-radius: 999px;
+      padding: 14px;
+      border-radius: var(--radius-full);
       font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s ease;
       font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
       border: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .btn:active {
+      transform: scale(0.96);
     }
 
     .btn-primary {
       background: linear-gradient(135deg, var(--accent), var(--accent2));
       color: white;
+      box-shadow: 0 4px 12px var(--accent-glow);
     }
 
     .btn-secondary {
-      background: rgba(255,255,255,.1);
+      background: var(--bg-card);
       color: var(--text);
-      border: 1px solid var(--stroke);
-    }
-
-    .btn:hover {
-      transform: translateY(-2px);
+      border: 1px solid var(--border);
     }
 
     .file-input {
@@ -1229,169 +1113,38 @@
       display: none !important;
     }
 
+    /* Мобильные элементы */
     .mobile-menu-btn {
       display: none;
-      width: 40px;
-      height: 40px;
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
-      background: rgba(255,255,255,.1);
-      border: 1px solid var(--stroke);
+      background: transparent;
+      border: none;
       color: var(--text);
       align-items: center;
       justify-content: center;
       cursor: pointer;
+      font-size: 18px;
+      -webkit-tap-highlight-color: rgba(124, 58, 237, 0.2);
+    }
+
+    .mobile-menu-btn:active {
+      background: rgba(124, 58, 237, 0.2);
     }
 
     .sidebar-overlay {
       display: none;
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,.5);
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
       z-index: 99;
-    }
-
-    .clear-chat-btn {
-      background: rgba(255,255,255,.04);
-      border: 1px solid var(--stroke);
-      color: #ff6b6b;
-      padding: 8px 16px;
-      border-radius: 20px;
-      cursor: pointer;
-      font-size: 12px;
-      transition: all 0.2s ease;
-    }
-
-    .clear-chat-btn:hover {
-      border-color: #ff6b6b;
-      background: rgba(255,107,107,.1);
-    }
-
-    /* Эмодзи-пикер улучшенный */
-    .emoji-picker {
-      position: fixed;
-      bottom: 90px;
-      left: 20px;
-      right: 20px;
-      max-width: 360px;
-      background: rgba(0,0,0,.95);
-      backdrop-filter: blur(20px);
-      border: 1px solid var(--stroke);
-      border-radius: 20px;
-      padding: 12px;
-      z-index: 200;
-      box-shadow: 0 20px 40px rgba(0,0,0,.4);
-      transition: all 0.2s ease;
-    }
-
-    body.light-theme .emoji-picker {
-      background: rgba(255,255,255,.95);
-    }
-
-    .emoji-header {
-      display: flex;
-      gap: 8px;
-      padding-bottom: 10px;
-      margin-bottom: 10px;
-      border-bottom: 1px solid var(--stroke);
-      overflow-x: auto;
-    }
-
-    .emoji-category {
-      background: transparent;
-      border: none;
-      color: var(--muted);
-      cursor: pointer;
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 20px;
-      transition: all 0.2s;
-    }
-
-    .emoji-category.active {
-      background: rgba(77,163,255,.2);
-      color: var(--accent);
-    }
-
-    .emoji-grid {
-      display: grid;
-      grid-template-columns: repeat(6, 1fr);
-      gap: 8px;
-      max-height: 250px;
-      overflow-y: auto;
-      padding: 4px;
-    }
-
-    .emoji-btn {
-      background: rgba(255,255,255,.08);
-      border: none;
-      border-radius: 12px;
-      padding: 12px;
-      font-size: 24px;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .emoji-btn:hover {
-      background: rgba(77,163,255,.3);
-      transform: scale(1.1);
-    }
-
-    .recent-emojis {
-      display: flex;
-      gap: 6px;
-      padding: 8px;
-      border-top: 1px solid var(--stroke);
-      margin-top: 8px;
-      flex-wrap: wrap;
-    }
-
-    .recent-emoji {
-      font-size: 20px;
-      cursor: pointer;
-      padding: 6px;
-      border-radius: 8px;
-      transition: all 0.2s;
-    }
-
-    .recent-emoji:hover {
-      background: rgba(77,163,255,.3);
-    }
-
-    /* Новый функционал: анимация печати */
-    .message-actions {
-      display: flex;
-      gap: 15px;
-      margin-top: 10px;
-      font-size: 12px;
-      color: var(--muted);
-    }
-
-    .reaction-btn {
-      background: none;
-      border: none;
-      color: var(--muted);
-      cursor: pointer;
-      font-size: 12px;
-      padding: 4px 8px;
-      border-radius: 12px;
-      transition: all 0.2s;
-    }
-
-    .reaction-btn:hover {
-      background: rgba(77,163,255,.2);
-      color: var(--accent);
     }
 
     .scroll-to-bottom {
       position: fixed;
-      bottom: 100px;
-      right: 30px;
+      bottom: calc(90px + var(--safe-bottom));
+      right: 16px;
       width: 40px;
       height: 40px;
       border-radius: 50%;
@@ -1403,64 +1156,216 @@
       display: none;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 4px 12px rgba(0,0,0,.3);
-      transition: all 0.2s;
+      box-shadow: var(--shadow-md);
+      -webkit-tap-highlight-color: transparent;
     }
 
-    .scroll-to-bottom:hover {
+    .scroll-to-bottom:active {
+      transform: scale(0.9);
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: calc(24px + var(--safe-bottom));
+      transform: translateX(-50%) translateY(10px);
+      z-index: 120;
+      opacity: 0;
+      pointer-events: none;
+      padding: 10px 20px;
+      border-radius: var(--radius-full);
+      background: var(--bg-elevated);
+      color: var(--text);
+      font-weight: 600;
+      font-size: 13px;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border);
+      transition: opacity 0.2s, transform 0.2s;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Эмодзи пикер */
+    .emoji-picker {
+      position: fixed;
+      bottom: calc(80px + var(--safe-bottom));
+      left: 8px;
+      right: 8px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 12px;
+      z-index: 200;
+      box-shadow: var(--shadow-lg);
+      animation: slideUp 0.2s ease;
+      max-height: 320px;
+    }
+
+    .emoji-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 6px;
+      max-height: 200px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .emoji-btn {
+      background: transparent;
+      border: none;
+      border-radius: var(--radius-sm);
+      padding: 10px;
+      font-size: 22px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      -webkit-tap-highlight-color: rgba(124, 58, 237, 0.2);
+    }
+
+    .emoji-btn:active {
+      background: rgba(124, 58, 237, 0.2);
       transform: scale(1.1);
     }
 
+    .recent-emojis {
+      display: flex;
+      gap: 4px;
+      padding: 8px;
+      border-top: 1px solid var(--border);
+      margin-top: 8px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .recent-emoji {
+      font-size: 20px;
+      cursor: pointer;
+      padding: 6px;
+      border-radius: var(--radius-sm);
+      flex-shrink: 0;
+    }
+
+    .recent-emoji:active {
+      background: rgba(124, 58, 237, 0.2);
+    }
+
+    /* Адаптация под мобильные */
     @media (max-width: 1024px) {
       .character-panel { display: none; }
-      .emoji-picker { left: 10px; right: 10px; max-width: none; }
     }
 
     @media (max-width: 768px) {
       .sidebar {
         position: fixed;
-        left: -100%;
+        left: 0;
         top: 0;
-        height: 100vh;
-        width: 100%;
-        max-width: 320px;
+        height: 100%;
+        width: 300px;
         z-index: 101;
-        transition: left 0.3s ease;
+        transform: translateX(-100%);
       }
-      .sidebar.active { left: 0; }
+
+      .sidebar.active {
+        transform: translateX(0);
+      }
+
       .mobile-menu-btn { display: flex; }
+      .sidebar-overlay { display: none; }
       .sidebar-overlay.active { display: block; }
-      .message { max-width: 85%; }
-      .settings-profile { flex-direction: column; text-align: center; }
-      .btn-group { flex-direction: column; }
-      .emoji-grid { grid-template-columns: repeat(5, 1fr); }
+
+      .message {
+        max-width: 85%;
+        font-size: 13px;
+      }
+
+      .chat-header {
+        padding: calc(8px + var(--safe-top)) 12px 8px;
+      }
+
+      .messages-container {
+        padding: 12px;
+      }
+
+      .input-area {
+        padding: 10px 12px calc(10px + var(--safe-bottom));
+      }
+
+      .settings-profile {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .btn-group {
+        flex-direction: column;
+      }
+
+      .emoji-grid {
+        grid-template-columns: repeat(5, 1fr);
+      }
+
+      .modal {
+        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+        max-height: 85vh;
+      }
     }
 
-    @media (max-width: 480px) {
-      .chat-header { padding: 15px; }
-      .messages-container { padding: 15px; }
-      .message { font-size: 13px; }
-      .current-character-avatar { width: 40px; height: 40px; }
-      .emoji-grid { grid-template-columns: repeat(4, 1fr); }
+    @media (max-width: 380px) {
+      .sidebar {
+        width: 280px;
+      }
+
+      .message {
+        max-width: 90%;
+        font-size: 13px;
+        padding: 8px 12px;
+      }
+
+      .current-character-avatar {
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+      }
+
+      .character-details h3 {
+        font-size: 14px;
+      }
+
+      .send-btn {
+        width: 36px;
+        height: 36px;
+      }
+
+      .emoji-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    @media (min-width: 769px) {
+      .modal {
+        border-radius: var(--radius-lg);
+        max-width: 420px;
+        margin: auto;
+      }
     }
   </style>
 </head>
 <body>
   <div class="bg"></div>
-  <div class="bg-grid"></div>
-  <div class="particles"></div>
-  <div class="blob b1"></div>
-  <div class="blob b2"></div>
-  <div class="blob b3"></div>
-  <div class="nav-overlay"></div>
   <div class="toast" id="toast"></div>
-  <button class="scroll-to-bottom" id="scrollToBottomBtn"><i class="fas fa-arrow-down"></i></button>
+  <button class="scroll-to-bottom" id="scrollToBottomBtn">
+    <i class="fas fa-chevron-down"></i>
+  </button>
 
   <div class="app-container">
+    <!-- Сайдбар -->
     <div class="sidebar" id="sidebar">
       <div class="sidebar-header">
-        <div class="logo">
-          <div class="logo-icon"><span>🤖</span></div>
+        <div class="logo" id="logoBtn">
+          <div class="logo-icon">🤖</div>
           <span>Lexi AI</span>
         </div>
       </div>
@@ -1479,164 +1384,1171 @@
 
       <div class="characters-list">
         <div class="section-title">Выбери персонажа</div>
+        
         <div class="character-card active" data-character="romantic">
-          <div class="character-header"><div class="character-avatar"><div class="avatar-upload-btn" data-avatar-upload="romantic"><i class="fas fa-camera"></i></div>С</div><div class="character-info"><div class="character-name">София</div><div class="character-age">19 лет</div></div><div class="character-status"></div></div>
+          <div class="character-header">
+            <div class="character-avatar">
+              <div class="avatar-upload-btn" data-avatar-upload="romantic"><i class="fas fa-camera"></i></div>
+              С
+            </div>
+            <div class="character-info">
+              <div class="character-name">София</div>
+              <div class="character-age">19 лет</div>
+            </div>
+            <div class="character-status"></div>
+          </div>
           <div class="character-description">💖 Мечтательная поэтесса</div>
         </div>
-        <div class="character-card" data-character="friendly"><div class="character-header"><div class="character-avatar"><div class="avatar-upload-btn" data-avatar-upload="friendly"><i class="fas fa-camera"></i></div>А</div><div class="character-info"><div class="character-name">Алиса</div><div class="character-age">20 лет</div></div><div class="character-status"></div></div><div class="character-description">😊 Душа компании</div></div>
-        <div class="character-card" data-character="flirty"><div class="character-header"><div class="character-avatar"><div class="avatar-upload-btn" data-avatar-upload="flirty"><i class="fas fa-camera"></i></div>В</div><div class="character-info"><div class="character-name">Виктория</div><div class="character-age">21 год</div></div><div class="character-status"></div></div><div class="character-description">😉 Загадочная модель</div></div>
-        <div class="character-card" data-character="smart"><div class="character-header"><div class="character-avatar"><div class="avatar-upload-btn" data-avatar-upload="smart"><i class="fas fa-camera"></i></div>М</div><div class="character-info"><div class="character-name">Маргарита</div><div class="character-age">22 года</div></div><div class="character-status"></div></div><div class="character-description">📚 Философ</div></div>
-        <div class="character-card" data-character="shy"><div class="character-header"><div class="character-avatar"><div class="avatar-upload-btn" data-avatar-upload="shy"><i class="fas fa-camera"></i></div>Е</div><div class="character-info"><div class="character-name">Ева</div><div class="character-age">18 лет</div></div><div class="character-status"></div></div><div class="character-description">🌸 Чувствительная мечтательница</div></div>
-        <div class="character-card" data-character="alternative"><div class="character-header"><div class="character-avatar"><div class="avatar-upload-btn" data-avatar-upload="alternative"><i class="fas fa-camera"></i></div>К</div><div class="character-info"><div class="character-name">Ксения</div><div class="character-age">18 лет</div></div><div class="character-status"></div></div><div class="character-description">🎌 Альтернативная анимешница</div></div>
-        <div class="character-card" data-character="aggressive"><div class="character-header"><div class="character-avatar"><div class="avatar-upload-btn" data-avatar-upload="aggressive"><i class="fas fa-camera"></i></div>Н</div><div class="character-info"><div class="character-name">Настя</div><div class="character-age">24 года</div></div><div class="character-status"></div></div><div class="character-description">💢 Грубая механик</div></div>
+
+        <div class="character-card" data-character="friendly">
+          <div class="character-header">
+            <div class="character-avatar">
+              <div class="avatar-upload-btn" data-avatar-upload="friendly"><i class="fas fa-camera"></i></div>
+              А
+            </div>
+            <div class="character-info">
+              <div class="character-name">Алиса</div>
+              <div class="character-age">20 лет</div>
+            </div>
+            <div class="character-status"></div>
+          </div>
+          <div class="character-description">😊 Душа компании</div>
+        </div>
+
+        <div class="character-card" data-character="flirty">
+          <div class="character-header">
+            <div class="character-avatar">
+              <div class="avatar-upload-btn" data-avatar-upload="flirty"><i class="fas fa-camera"></i></div>
+              В
+            </div>
+            <div class="character-info">
+              <div class="character-name">Виктория</div>
+              <div class="character-age">21 год</div>
+            </div>
+            <div class="character-status"></div>
+          </div>
+          <div class="character-description">😉 Загадочная модель</div>
+        </div>
+
+        <div class="character-card" data-character="smart">
+          <div class="character-header">
+            <div class="character-avatar">
+              <div class="avatar-upload-btn" data-avatar-upload="smart"><i class="fas fa-camera"></i></div>
+              М
+            </div>
+            <div class="character-info">
+              <div class="character-name">Маргарита</div>
+              <div class="character-age">22 года</div>
+            </div>
+            <div class="character-status"></div>
+          </div>
+          <div class="character-description">📚 Философ</div>
+        </div>
+
+        <div class="character-card" data-character="shy">
+          <div class="character-header">
+            <div class="character-avatar">
+              <div class="avatar-upload-btn" data-avatar-upload="shy"><i class="fas fa-camera"></i></div>
+              Е
+            </div>
+            <div class="character-info">
+              <div class="character-name">Ева</div>
+              <div class="character-age">18 лет</div>
+            </div>
+            <div class="character-status"></div>
+          </div>
+          <div class="character-description">🌸 Чувствительная мечтательница</div>
+        </div>
+
+        <div class="character-card" data-character="alternative">
+          <div class="character-header">
+            <div class="character-avatar">
+              <div class="avatar-upload-btn" data-avatar-upload="alternative"><i class="fas fa-camera"></i></div>
+              К
+            </div>
+            <div class="character-info">
+              <div class="character-name">Ксения</div>
+              <div class="character-age">18 лет</div>
+            </div>
+            <div class="character-status"></div>
+          </div>
+          <div class="character-description">🎌 Анимешница</div>
+        </div>
+
+        <div class="character-card" data-character="aggressive">
+          <div class="character-header">
+            <div class="character-avatar">
+              <div class="avatar-upload-btn" data-avatar-upload="aggressive"><i class="fas fa-camera"></i></div>
+              Н
+            </div>
+            <div class="character-info">
+              <div class="character-name">Настя</div>
+              <div class="character-age">24 года</div>
+            </div>
+            <div class="character-status"></div>
+          </div>
+          <div class="character-description">💢 Грубая механик</div>
+        </div>
       </div>
     </div>
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
+    <!-- Чат -->
     <div class="chat-area" id="chatArea">
       <div class="chat-header">
-        <button class="mobile-menu-btn" id="mobileMenuBtn"><i class="fas fa-bars"></i></button>
-        <div class="current-character">
-          <div class="current-character-avatar" id="currentCharacterAvatar"><div class="avatar-upload-btn" data-avatar-upload="current"><i class="fas fa-camera"></i></div>С</div>
-          <div class="character-details"><h3 id="currentCharacterName">София</h3><p id="currentCharacterDescription">💖 Мечтательная поэтесса</p></div>
+        <button class="mobile-menu-btn" id="mobileMenuBtn">
+          <i class="fas fa-bars"></i>
+        </button>
+        <div class="current-character" id="currentCharacterHeader">
+          <div class="current-character-avatar" id="currentCharacterAvatar">
+            <div class="avatar-upload-btn" data-avatar-upload="current"><i class="fas fa-camera"></i></div>
+            С
+          </div>
+          <div class="character-details">
+            <h3 id="currentCharacterName">София</h3>
+            <p id="currentCharacterDescription">💖 Мечтательная поэтесса</p>
+          </div>
         </div>
         <div class="chat-actions">
-          <button class="action-btn" id="clearChatBtn" title="Очистить чат"><i class="fas fa-trash-alt"></i></button>
-          <button class="action-btn" id="settingsBtn"><i class="fas fa-cog"></i></button>
-          <button class="action-btn" id="infoBtn"><i class="fas fa-info"></i></button>
+          <button class="action-btn" id="clearChatBtn" title="Очистить чат">
+            <i class="fas fa-trash-alt"></i>
+          </button>
+          <button class="action-btn" id="settingsBtn" title="Настройки">
+            <i class="fas fa-cog"></i>
+          </button>
         </div>
       </div>
-      <div class="messages-container" id="messagesContainer"></div>
+
+      <div class="messages-container" id="messagesContainer">
+        <!-- Сообщения загружаются динамически -->
+      </div>
+
       <div class="input-area">
         <div class="message-input-container">
-          <input type="text" class="message-input" id="messageInput" placeholder="Напиши сообщение..." maxlength="500">
-          <div class="input-actions"><button class="icon-btn" id="emojiBtn"><i class="fas fa-smile"></i></button></div>
-          <button class="send-btn" id="sendButton"><i class="fas fa-paper-plane"></i></button>
+          <input 
+            type="text" 
+            class="message-input" 
+            id="messageInput" 
+            placeholder="Напиши сообщение..." 
+            maxlength="500"
+            autocomplete="off"
+            enterkeyhint="send"
+          >
+          <div class="input-actions">
+            <button class="icon-btn" id="emojiBtn" title="Эмодзи">
+              <i class="fas fa-smile"></i>
+            </button>
+          </div>
+          <button class="send-btn" id="sendButton" title="Отправить">
+            <i class="fas fa-paper-plane"></i>
+          </button>
         </div>
       </div>
     </div>
 
+    <!-- Настройки -->
     <div class="settings-view hidden" id="settingsView">
       <div class="settings-container">
-        <div class="settings-header"><div class="settings-profile"><div class="profile-avatar-large" id="profileAvatarLarge">П</div><input type="file" id="avatarUpload" class="file-input" accept="image/*"><div class="profile-info"><h2 id="profileName">Пользователь</h2><p>Online</p></div></div></div>
+        <div class="settings-header">
+          <div class="settings-profile">
+            <div class="profile-avatar-large" id="profileAvatarLarge">П</div>
+            <input type="file" id="avatarUpload" class="file-input" accept="image/*">
+            <div class="profile-info">
+              <h2 id="profileName">Пользователь</h2>
+              <p>Online</p>
+            </div>
+          </div>
+        </div>
+
         <div class="settings-sections">
-          <div class="settings-section"><div class="settings-section-title"><i class="fas fa-palette"></i> Внешний вид</div><div class="theme-switcher"><div class="theme-option active" data-theme="dark"><i class="fas fa-moon"></i><div class="theme-name">Темная</div></div><div class="theme-option" data-theme="light"><i class="fas fa-sun"></i><div class="theme-name">Светлая</div></div></div></div>
-          <div class="settings-section"><div class="settings-section-title"><i class="fas fa-comment-dots"></i> Чаты</div><div class="settings-item" id="clearAllChatsBtn"><div class="settings-icon"><i class="fas fa-trash-alt"></i></div><div class="settings-content"><h3>Очистить все чаты</h3><p>Удалить всю историю переписки</p></div><div class="settings-arrow">›</div></div></div>
-          <div class="settings-section"><div class="settings-section-title"><i class="fas fa-user-cog"></i> Настройки аккаунта</div><div class="settings-item" id="editProfileBtn"><div class="settings-icon"><i class="fas fa-user-edit"></i></div><div class="settings-content"><h3>Редактировать профиль</h3><p>Изменить имя, аватар</p></div><div class="settings-arrow">›</div></div><div class="settings-item" id="privacySettingsBtn"><div class="settings-icon"><i class="fas fa-shield-alt"></i></div><div class="settings-content"><h3>Конфиденциальность</h3><p>Настройки приватности</p></div><div class="settings-arrow">›</div></div></div>
-          <div class="settings-section"><div class="settings-section-title"><i class="fas fa-crown"></i> VIP Подписка</div><div class="settings-item" id="vipSettingsBtn"><div class="settings-icon"><i class="fas fa-gem"></i></div><div class="settings-content"><h3>Управление подпиской</h3><p id="vipStatusText">Неактивна</p></div><div class="settings-arrow">›</div></div></div>
+          <div class="settings-section">
+            <div class="settings-section-title">
+              <i class="fas fa-palette"></i> Внешний вид
+            </div>
+            <div class="theme-switcher">
+              <div class="theme-option active" data-theme="dark">
+                <i class="fas fa-moon"></i>
+                <div class="theme-name">Темная</div>
+              </div>
+              <div class="theme-option" data-theme="light">
+                <i class="fas fa-sun"></i>
+                <div class="theme-name">Светлая</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-section">
+            <div class="settings-section-title">
+              <i class="fas fa-comment-dots"></i> Чаты
+            </div>
+            <div class="settings-item" id="clearAllChatsBtn">
+              <div class="settings-icon"><i class="fas fa-trash-alt"></i></div>
+              <div class="settings-content">
+                <h3>Очистить все чаты</h3>
+                <p>Удалить всю историю переписки</p>
+              </div>
+              <div class="settings-arrow">›</div>
+            </div>
+          </div>
+
+          <div class="settings-section">
+            <div class="settings-section-title">
+              <i class="fas fa-user-cog"></i> Аккаунт
+            </div>
+            <div class="settings-item" id="editProfileBtn">
+              <div class="settings-icon"><i class="fas fa-user-edit"></i></div>
+              <div class="settings-content">
+                <h3>Редактировать профиль</h3>
+                <p>Изменить имя и аватар</p>
+              </div>
+              <div class="settings-arrow">›</div>
+            </div>
+            <div class="settings-item" id="privacySettingsBtn">
+              <div class="settings-icon"><i class="fas fa-shield-alt"></i></div>
+              <div class="settings-content">
+                <h3>Конфиденциальность</h3>
+                <p>Настройки приватности</p>
+              </div>
+              <div class="settings-arrow">›</div>
+            </div>
+          </div>
+
+          <div class="settings-section">
+            <div class="settings-section-title">
+              <i class="fas fa-crown"></i> VIP Подписка
+            </div>
+            <div class="settings-item" id="vipSettingsBtn">
+              <div class="settings-icon"><i class="fas fa-gem"></i></div>
+              <div class="settings-content">
+                <h3>Управление подпиской</h3>
+                <p id="vipStatusText">Неактивна</p>
+              </div>
+              <div class="settings-arrow">›</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
+    <!-- Панель персонажа -->
     <div class="character-panel" id="characterPanel">
-      <div class="panel-header"><div class="panel-avatar" id="panelCharacterAvatar"><div class="avatar-upload-btn" data-avatar-upload="panel"><i class="fas fa-camera"></i></div>С</div><h2 id="panelCharacterName">София</h2><p id="panelCharacterAge">19 лет</p></div>
-      <div class="character-stats"><div class="stat-card"><div class="stat-value" id="messageCount">0</div><div class="stat-label">Сообщений</div></div><div class="stat-card"><div class="stat-value" id="apiStatus">✓</div><div class="stat-label">API статус</div></div></div>
-      <div class="character-bio"><div class="bio-title"><i class="fas fa-heart"></i> О персонаже</div><div class="bio-text" id="characterBio">София - мечтательная поэтесса с романтической душой.</div></div>
-      <div class="vip-banner" id="vipBanner"><div class="vip-title"><i class="fas fa-crown"></i> VIP ДОСТУП</div><div class="vip-text">Неограниченное общение + эксклюзивные эмодзи</div><button class="vip-btn" id="vipBannerBtn">АКТИВИРОВАТЬ</button></div>
+      <div class="panel-header">
+        <div class="panel-avatar" id="panelCharacterAvatar">
+          <div class="avatar-upload-btn" data-avatar-upload="panel"><i class="fas fa-camera"></i></div>
+          С
+        </div>
+        <h2 id="panelCharacterName">София</h2>
+        <p id="panelCharacterAge" style="color: var(--text-secondary);">19 лет</p>
+      </div>
+
+      <div class="character-stats">
+        <div class="stat-card">
+          <div class="stat-value" id="messageCount">0</div>
+          <div class="stat-label">Сообщений</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="apiStatus">✓</div>
+          <div class="stat-label">API</div>
+        </div>
+      </div>
+
+      <div class="character-bio">
+        <div class="bio-title"><i class="fas fa-heart"></i> О персонаже</div>
+        <div class="bio-text" id="characterBio">София - мечтательная поэтесса с романтической душой.</div>
+      </div>
+
+      <div class="vip-banner" id="vipBanner">
+        <div class="vip-title"><i class="fas fa-crown"></i> VIP ДОСТУП</div>
+        <div class="vip-text">Неограниченное общение</div>
+        <button class="vip-btn" id="vipBannerBtn">АКТИВИРОВАТЬ</button>
+      </div>
     </div>
   </div>
 
+  <!-- Модальные окна -->
   <div class="modal-overlay hidden" id="modalOverlay">
-    <div class="modal hidden" id="vipModal"><div class="modal-header"><h3>💎 VIP ПОДПИСКА</h3><button class="close-modal">&times;</button></div><div class="feature-item"><i class="fas fa-infinity"></i><span>Неограниченные сообщения</span></div><div class="feature-item"><i class="fas fa-bolt"></i><span>Приоритетная обработка</span></div><div class="feature-item"><i class="fas fa-microphone"></i><span>Голосовые сообщения</span></div><div class="feature-item"><i class="fas fa-star"></i><span>Эксклюзивные эмодзи ✨</span></div><div class="pricing-options"><div class="price-option active" data-duration="30" data-price="199"><div class="price-duration">30 дней</div><div class="price-amount">199 ₽</div></div><div class="price-option" data-duration="90" data-price="499"><div class="price-duration">90 дней</div><div class="price-amount">499 ₽</div></div></div><div class="btn-group"><button class="btn btn-secondary cancel-modal-btn">Позже</button><button class="btn btn-primary" id="purchaseVipBtn">КУПИТЬ</button></div></div>
-    <div class="modal hidden" id="profileModal"><div class="modal-header"><h3>👤 РЕДАКТИРОВАНИЕ</h3><button class="close-modal">&times;</button></div><div style="text-align:center;margin-bottom:20px"><div class="profile-avatar-large" id="editProfileAvatar">П</div><input type="file" id="editAvatarUpload" class="file-input" accept="image/*"><div style="color:var(--accent);cursor:pointer;margin-top:10px" id="changeAvatarBtn"><i class="fas fa-camera"></i> Сменить аватар</div></div><input type="text" id="editUserName" style="width:100%;background:rgba(255,255,255,.04);border:1px solid var(--stroke);border-radius:10px;padding:12px;color:var(--text);margin-bottom:15px" value="Пользователь"><div class="btn-group"><button class="btn btn-secondary cancel-modal-btn">Отмена</button><button class="btn btn-primary" id="saveProfileBtn">СОХРАНИТЬ</button></div></div>
-    <div class="modal hidden" id="botAvatarModal"><div class="modal-header"><h3>📷 АВАТАР ПЕРСОНАЖА</h3><button class="close-modal">&times;</button></div><div style="text-align:center;margin-bottom:20px"><div class="profile-avatar-large" id="botAvatarPreview">С</div><input type="file" id="botAvatarUpload" class="file-input" accept="image/*"><div style="color:var(--accent);cursor:pointer;margin-top:10px" id="uploadBotAvatarBtn"><i class="fas fa-camera"></i> Загрузить</div></div><div class="btn-group"><button class="btn btn-secondary" id="removeBotAvatarBtn">УДАЛИТЬ</button><button class="btn btn-primary" id="saveBotAvatarBtn">СОХРАНИТЬ</button></div></div>
-    <div class="modal hidden" id="privacyModal"><div class="modal-header"><h3>🔒 КОНФИДЕНЦИАЛЬНОСТЬ</h3><button class="close-modal">&times;</button></div><div class="feature-item"><i class="fas fa-database"></i><span>Данные хранятся локально</span></div><div class="feature-item"><i class="fas fa-trash"></i><span>Возможность очистки данных</span></div><div style="margin-top:20px"><button class="btn btn-secondary" id="clearAllDataBtn" style="background:#ff6b6b;color:white">ОЧИСТИТЬ ВСЕ ДАННЫЕ</button></div></div>
+    <div class="modal hidden" id="vipModal">
+      <div class="modal-header">
+        <h3>💎 VIP ПОДПИСКА</h3>
+        <button class="close-modal">&times;</button>
+      </div>
+      <div class="feature-item"><i class="fas fa-infinity"></i><span>Неограниченные сообщения</span></div>
+      <div class="feature-item"><i class="fas fa-bolt"></i><span>Приоритетная обработка</span></div>
+      <div class="feature-item"><i class="fas fa-star"></i><span>Эксклюзивные функции</span></div>
+      <div class="pricing-options">
+        <div class="price-option active" data-duration="30" data-price="199">
+          <div class="price-duration">30 дней</div>
+          <div class="price-amount">199 ₽</div>
+        </div>
+        <div class="price-option" data-duration="90" data-price="499">
+          <div class="price-duration">90 дней</div>
+          <div class="price-amount">499 ₽</div>
+        </div>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-secondary cancel-modal-btn">Позже</button>
+        <button class="btn btn-primary" id="purchaseVipBtn">КУПИТЬ</button>
+      </div>
+    </div>
+
+    <div class="modal hidden" id="profileModal">
+      <div class="modal-header">
+        <h3>👤 РЕДАКТИРОВАНИЕ</h3>
+        <button class="close-modal">&times;</button>
+      </div>
+      <div style="text-align:center;margin-bottom:16px">
+        <div class="profile-avatar-large" id="editProfileAvatar">П</div>
+        <input type="file" id="editAvatarUpload" class="file-input" accept="image/*">
+        <div style="color:var(--accent-light);cursor:pointer;margin-top:8px;font-size:13px;" id="changeAvatarBtn">
+          <i class="fas fa-camera"></i> Сменить аватар
+        </div>
+      </div>
+      <input 
+        type="text" 
+        id="editUserName" 
+        style="width:100%;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;color:var(--text);margin-bottom:12px;font-size:15px;"
+        value="Пользователь"
+        placeholder="Ваше имя"
+      >
+      <div class="btn-group">
+        <button class="btn btn-secondary cancel-modal-btn">Отмена</button>
+        <button class="btn btn-primary" id="saveProfileBtn">СОХРАНИТЬ</button>
+      </div>
+    </div>
+
+    <div class="modal hidden" id="botAvatarModal">
+      <div class="modal-header">
+        <h3>📷 АВАТАР ПЕРСОНАЖА</h3>
+        <button class="close-modal">&times;</button>
+      </div>
+      <div style="text-align:center;margin-bottom:16px">
+        <div class="profile-avatar-large" id="botAvatarPreview">С</div>
+        <input type="file" id="botAvatarUpload" class="file-input" accept="image/*">
+        <div style="color:var(--accent-light);cursor:pointer;margin-top:8px;font-size:13px;" id="uploadBotAvatarBtn">
+          <i class="fas fa-camera"></i> Загрузить
+        </div>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-secondary" id="removeBotAvatarBtn">УДАЛИТЬ</button>
+        <button class="btn btn-primary" id="saveBotAvatarBtn">СОХРАНИТЬ</button>
+      </div>
+    </div>
+
+    <div class="modal hidden" id="privacyModal">
+      <div class="modal-header">
+        <h3>🔒 КОНФИДЕНЦИАЛЬНОСТЬ</h3>
+        <button class="close-modal">&times;</button>
+      </div>
+      <div class="feature-item"><i class="fas fa-database"></i><span>Данные хранятся локально</span></div>
+      <div class="feature-item"><i class="fas fa-trash"></i><span>Возможность очистки данных</span></div>
+      <div style="margin-top:16px">
+        <button class="btn" id="clearAllDataBtn" style="background:#ef4444;color:white;width:100%;">ОЧИСТИТЬ ВСЕ ДАННЫЕ</button>
+      </div>
+    </div>
   </div>
 
   <script>
-    (function(){
-      const API_CONFIG={url:"https://api.intelligence.io.solutions/api/v1/chat/completions",token:"io-v2-eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJvd25lciI6Ijc0YzdhZTM2LTA3MzktNDQzZi05Mzg5LTliNTNlY2RhMTAyYSIsImV4cCI6NDkyODQwNDA3Mn0.XgMNRxnpE7Qf1EFWJhKh2j0-sSGsWEMYfVT22FHpAOEfkgOP11kLd2kzjO8mDThM0fpDFTss408raX79m2lILg",model:"meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8"};
-      const characters={romantic:{name:"София",age:"19 лет",avatar:"С",description:"💖 Мечтательная поэтесса",bio:"София - мечтательная поэтесса с романтической душой. Она пишет стихи и верит в настоящую любовь.",prompt:"Ты - София, 19 лет. Мечтательная поэтесса. Отвечай эмоционально, используй метафоры и поэтические выражения."},friendly:{name:"Алиса",age:"20 лет",avatar:"А",description:"😊 Душа компании",bio:"Алиса - открытая и добрая девушка, всегда готова поддержать разговор.",prompt:"Ты - Алиса, 20 лет. Душа компании. Отвечай дружелюбно, используй эмодзи."},flirty:{name:"Виктория",age:"21 год",avatar:"В",description:"😉 Загадочная модель",bio:"Виктория - стильная модель с загадочным характером.",prompt:"Ты - Виктория, модель. Отвечай кокетливо и загадочно."},smart:{name:"Маргарита",age:"22 года",avatar:"М",description:"📚 Философ",bio:"Маргарита - умная и начитанная девушка, любит философствовать.",prompt:"Ты - Маргарита, философ. Отвечай глубокомысленно, задавай интересные вопросы."},shy:{name:"Ева",age:"18 лет",avatar:"Е",description:"🌸 Мечтательница",bio:"Ева - чувствительная художница, немного застенчива.",prompt:"Ты - Ева, застенчивая художница. Отвечай мягко и немного стеснительно."},alternative:{name:"Ксения",age:"18 лет",avatar:"К",description:"🎌 Анимешница",bio:"Ксения - яркая неформалка, увлекается аниме и косплеем.",prompt:"Ты - Ксения, увлекаешься аниме. Отвечай энергично, используй сленг аниме-фанатов."},aggressive:{name:"Настя",age:"24 года",avatar:"Н",description:"💢 Грубая механик",bio:"Настя - прямолинейная механик с грубоватым характером.",prompt:"Ты - Настя, автомеханик с характером. Отвечай грубовато и прямолинейно, но не перегибай палку."}};
-      
-      let state={currentCharacter:"romantic",isTyping:false,messageCount:0,currentView:"chat",currentBotAvatarEdit:null};
-      let userData={name:"Пользователь",avatar:"П",avatarImage:null,theme:"dark",vip:{active:false,expires:null},botAvatars:{},recentEmojis:[]};
-      let chatHistory={}; Object.keys(characters).forEach(c=>chatHistory[c]=[]);
-      
-      function saveToLS(k,d){localStorage.setItem(`lexi_${k}`,JSON.stringify(d));}
-      function loadFromLS(k){const d=localStorage.getItem(`lexi_${k}`);return d?JSON.parse(d):null;}
-      function getTime(){const d=new Date();return d.getHours().toString().padStart(2,'0')+":"+d.getMinutes().toString().padStart(2,'0');}
-      function escapeHtml(t){const div=document.createElement('div');div.textContent=t;return div.innerHTML;}
-      function scrollBottom(){const c=document.getElementById('messagesContainer');if(c){c.scrollTop=c.scrollHeight;document.getElementById('scrollToBottomBtn').style.display='none';}}
-      function showToast(t){const toast=document.getElementById('toast');if(!toast)return;toast.textContent=t;toast.classList.add('show');clearTimeout(window.toastTimer);window.toastTimer=setTimeout(()=>toast.classList.remove('show'),1300);}
-      
-      function loadUserData(){const d=loadFromLS('user_data');if(d){userData={...userData,...d};if(userData.vip?.expires&&Date.now()>userData.vip.expires){userData.vip.active=false;userData.vip.expires=null;}if(!userData.recentEmojis)userData.recentEmojis=[];}document.body.classList.toggle('light-theme',userData.theme==='light');updateAllUI();}
-      function saveUserData(){saveToLS('user_data',userData);}
-      function loadChatHistory(){const h=loadFromLS('chat_history');if(h)chatHistory={...chatHistory,...h};Object.keys(characters).forEach(c=>{if(!chatHistory[c])chatHistory[c]=[];});loadCurrentChat();}
-      function saveChatHistory(){saveToLS('chat_history',chatHistory);}
-      
-      function addMessage(h,t,ty){if(!chatHistory[h])chatHistory[h]=[];chatHistory[h].push({text:t,type:ty,time:getTime()});if(chatHistory[h].length>200)chatHistory[h]=chatHistory[h].slice(-200);saveChatHistory();}
-      
-      function updateAllUI(){document.getElementById('userName').textContent=userData.name;document.getElementById('profileName').textContent=userData.name;document.getElementById('editUserName').value=userData.name;['userAvatar','profileAvatarLarge','editProfileAvatar'].forEach(id=>{const el=document.getElementById(id);if(el){if(userData.avatarImage)el.innerHTML=`<img src="${userData.avatarImage}">`;else el.textContent=userData.avatar;}});Object.keys(characters).forEach(c=>{const img=userData.botAvatars?.[c];const el=document.querySelector(`[data-character="${c}"] .character-avatar`);if(el){if(img)el.innerHTML=`<img src="${img}"><div class="avatar-upload-btn" data-avatar-upload="${c}"><i class="fas fa-camera"></i></div>`;else el.innerHTML=`${characters[c].avatar}<div class="avatar-upload-btn" data-avatar-upload="${c}"><i class="fas fa-camera"></i></div>`}});updateVipDisplay();updateMessageCount();}
-      
-      function updateVipDisplay(){const badge=document.getElementById('vipBadge');const banner=document.getElementById('vipBanner');const text=document.getElementById('vipStatusText');if(userData.vip.active){if(badge)badge.classList.add('active');if(banner)banner.classList.add('vip-active');if(text)text.textContent="Активна";}else{if(badge)badge.classList.remove('active');if(banner)banner.classList.remove('vip-active');if(text)text.textContent="Неактивна";}}
-      
-      function updateMessageCount(){const count=(chatHistory[state.currentCharacter]||[]).filter(m=>m.type==='outgoing').length;state.messageCount=count;const el=document.getElementById('messageCount');if(el)el.textContent=count;}
-      
-      function updateCharacterDisplay(c){const d=characters[c];document.getElementById('currentCharacterName').textContent=d.name;document.getElementById('currentCharacterDescription').textContent=d.description;document.getElementById('panelCharacterName').textContent=d.name;document.getElementById('panelCharacterAge').textContent=d.age;document.getElementById('characterBio').textContent=d.bio;const av=userData.botAvatars?.[c]||d.avatar;const curr=document.getElementById('currentCharacterAvatar');if(curr)curr.innerHTML=`<img src="${av}" onerror="this.style.display='none';this.nextSibling?this.nextSibling.style.display='flex':null"><div class="avatar-upload-btn" data-avatar-upload="current"><i class="fas fa-camera"></i></div>`;const panel=document.getElementById('panelCharacterAvatar');if(panel)panel.innerHTML=`<img src="${av}" onerror="this.style.display='none';this.nextSibling?this.nextSibling.style.display='flex':null"><div class="avatar-upload-btn" data-avatar-upload="panel"><i class="fas fa-camera"></i></div>`;}
-      
-      function loadCurrentChat(){const cont=document.getElementById('messagesContainer');if(!cont)return;cont.innerHTML='';const hist=chatHistory[state.currentCharacter]||[];if(hist.length===0){addSystemMessage(`Привет! Я ${characters[state.currentCharacter].name}. Давай пообщаемся! 💫`);}else{hist.forEach(msg=>{const div=document.createElement('div');div.className=`message ${msg.type==='outgoing'?'message-outgoing':'message-incoming'}`;div.innerHTML=`${escapeHtml(msg.text)}<div class="message-time">${msg.time}</div>`;cont.appendChild(div);});scrollBottom();}}
-      
-      function addOutgoingMessage(t){const cont=document.getElementById('messagesContainer');const div=document.createElement('div');div.className='message message-outgoing';div.innerHTML=`${escapeHtml(t)}<div class="message-time">${getTime()}</div>`;cont.appendChild(div);addMessage(state.currentCharacter,t,'outgoing');updateMessageCount();scrollBottom();}
-      
-      function addIncomingMessage(t){const cont=document.getElementById('messagesContainer');const div=document.createElement('div');div.className='message message-incoming';div.innerHTML=`${escapeHtml(t)}<div class="message-time">${getTime()}</div>`;cont.appendChild(div);addMessage(state.currentCharacter,t,'incoming');scrollBottom();}
-      
-      function addSystemMessage(t){const cont=document.getElementById('messagesContainer');const div=document.createElement('div');div.className='message message-incoming';div.style.background='rgba(77,163,255,.2)';div.innerHTML=`<i class="fas fa-info-circle"></i> ${escapeHtml(t)}<div class="message-time">${getTime()}</div>`;cont.appendChild(div);scrollBottom();}
-      
-      function showTyping(){if(state.isTyping)return;const div=document.createElement('div');div.className='typing-indicator';div.id='typingIndicator';div.innerHTML='<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';document.getElementById('messagesContainer').appendChild(div);scrollBottom();state.isTyping=true;}
-      function hideTyping(){const el=document.getElementById('typingIndicator');if(el)el.remove();state.isTyping=false;}
-      
-      async function getAIResponse(msg,char){try{const res=await fetch(API_CONFIG.url,{method:'POST',headers:{'Authorization':`Bearer ${API_CONFIG.token}`,'Content-Type':'application/json'},body:JSON.stringify({messages:[{role:"system",content:characters[char].prompt},{role:"user",content:msg}],model:API_CONFIG.model,max_tokens:500,temperature:0.9})});if(!res.ok)throw new Error(`HTTP ${res.status}`);const data=await res.json();if(data.choices?.[0]){let reply=data.choices[0].message.content;reply=reply.replace(/\([^)]*\)/g,'').replace(/\[.*?\]/g,'').replace(/как ИИ|как нейросеть|как ассистент/gi,'').trim();return reply||"Извини, повтори?";}throw new Error();}catch(e){console.error('API Error:',e);throw e;}}
-      
-      async function sendMessage(){const input=document.getElementById('messageInput');const msg=input.value.trim();if(!msg||state.isTyping)return;if(!userData.vip.active&&state.messageCount>=30){addSystemMessage('Лимит сообщений (30). Купите VIP для неограниченного общения!');showModal('vipModal');return;}input.value='';addOutgoingMessage(msg);showTyping();try{const resp=await getAIResponse(msg,state.currentCharacter);hideTyping();addIncomingMessage(resp);}catch(e){hideTyping();addSystemMessage('Ошибка соединения. Попробуй еще раз.');}}
-      
-      function selectCharacter(c){document.querySelectorAll('.character-card').forEach(card=>card.classList.remove('active'));document.querySelector(`[data-character="${c}"]`).classList.add('active');state.currentCharacter=c;updateCharacterDisplay(c);updateMessageCount();loadCurrentChat();addSystemMessage(`💬 Теперь вы общаетесь с ${characters[c].name}`);closeMobileMenu();}
-      
-      function clearCurrentChat(){if(confirm('Очистить историю диалога с текущим персонажем?')){chatHistory[state.currentCharacter]=[];saveChatHistory();loadCurrentChat();addSystemMessage('Чат очищен');showToast('Чат очищен');}}
-      
-      function clearAllChats(){if(confirm('⚠️ ВНИМАНИЕ! Это удалит ВСЮ историю переписки со всеми персонажами. Отменить нельзя. Продолжить?')){Object.keys(chatHistory).forEach(c=>{chatHistory[c]=[];});saveChatHistory();loadCurrentChat();addSystemMessage('Вся история чатов очищена');showToast('Все чаты очищены');}}
-      
-      function clearAllData(){if(confirm('⚠️ ЭТО УДАЛИТ ВСЕ ДАННЫЕ: профиль, аватары, историю чатов, настройки. Действие необратимо. Продолжить?')){localStorage.clear();location.reload();}}
-      
-      function showModal(id){const ov=document.getElementById('modalOverlay');ov.classList.remove('hidden');document.querySelectorAll('.modal').forEach(m=>m.classList.add('hidden'));document.getElementById(id).classList.remove('hidden');}
-      function hideModal(){document.getElementById('modalOverlay').classList.add('hidden');document.querySelectorAll('.modal').forEach(m=>m.classList.add('hidden'));}
-      
-      function showSettings(){document.getElementById('chatArea').classList.add('hidden');document.getElementById('settingsView').classList.remove('hidden');if(document.getElementById('characterPanel'))document.getElementById('characterPanel').classList.add('hidden');state.currentView='settings';}
-      function showChat(){document.getElementById('settingsView').classList.add('hidden');document.getElementById('chatArea').classList.remove('hidden');if(document.getElementById('characterPanel')&&window.innerWidth>1024)document.getElementById('characterPanel').classList.remove('hidden');state.currentView='chat';}
-      
-      function changeTheme(t){userData.theme=t;document.body.classList.toggle('light-theme',t==='light');document.querySelectorAll('.theme-option').forEach(opt=>opt.classList.toggle('active',opt.getAttribute('data-theme')===t));saveUserData();showToast(`Тема: ${t==='dark'?'Темная':'Светлая'}`);}
-      
-      function purchaseVip(){const opt=document.querySelector('#vipModal .price-option.active');if(!opt)return;const dur=parseInt(opt.getAttribute('data-duration'));const price=opt.getAttribute('data-price');userData.vip={active:true,expires:Date.now()+dur*86400000};updateVipDisplay();saveUserData();hideModal();addSystemMessage(`🎉 VIP подписка активирована на ${dur} дней! Спасибо за покупку (${price}₽)`);showToast('VIP активирован!');}
-      
-      function toggleMobileMenu(){document.getElementById('sidebar').classList.toggle('active');document.getElementById('sidebarOverlay').classList.toggle('active');}
-      function closeMobileMenu(){document.getElementById('sidebar').classList.remove('active');document.getElementById('sidebarOverlay').classList.remove('active');}
-      
-      function openBotAvatarUpload(t){state.currentBotAvatarEdit=t==='current'||t==='panel'?state.currentCharacter:t;const char=characters[state.currentBotAvatarEdit];const preview=document.getElementById('botAvatarPreview');const img=userData.botAvatars?.[state.currentBotAvatarEdit];if(img){preview.innerHTML=`<img src="${img}">`;}else{preview.innerHTML=char.avatar;}showModal('botAvatarModal');}
-      
-      function handleAvatarUpload(e,isBot=false){const file=e.target.files[0];if(!file||!file.type.startsWith('image/')){showToast('Выберите изображение');return;}const reader=new FileReader();reader.onload=ev=>{if(isBot){if(!userData.botAvatars)userData.botAvatars={};userData.botAvatars[state.currentBotAvatarEdit]=ev.target.result;const preview=document.getElementById('botAvatarPreview');if(preview)preview.innerHTML=`<img src="${ev.target.result}">`;}else{userData.avatarImage=ev.target.result;updateAllUI();saveUserData();}showToast('Аватар обновлен');};reader.readAsDataURL(file);}
-      
-      function saveBotAvatar(){saveUserData();updateAllUI();updateCharacterDisplay(state.currentCharacter);hideModal();showToast('Аватар сохранен');}
-      function removeBotAvatar(){if(userData.botAvatars?.[state.currentBotAvatarEdit])delete userData.botAvatars[state.currentBotAvatarEdit];saveUserData();updateAllUI();updateCharacterDisplay(state.currentCharacter);hideModal();showToast('Аватар удален');}
-      
-      function saveProfile(){userData.name=document.getElementById('editUserName').value.trim()||"Пользователь";saveUserData();updateAllUI();hideModal();showToast("Профиль сохранен");}
-      
-      function testApi(){const status=document.getElementById('apiStatus');if(status)status.textContent="✓";}
-      
-      function addRecentEmoji(emoji){if(!userData.recentEmojis.includes(emoji)){userData.recentEmojis.unshift(emoji);if(userData.recentEmojis.length>12)userData.recentEmojis.pop();saveUserData();}}
-      
-      function initEmojiPicker(){const emojiBtn=document.getElementById('emojiBtn');const input=document.getElementById('messageInput');let pickerDiv=null;
-        const emojiCategories={смайлы:['😊','😂','❤️','😍','👍','🔥','💯','🎉','😢','😭','😡','🤔','😎','🤗','😘','💖','✨','🌟','⭐','💪','🎵','🍕','🎮','📚'],животные:['🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐨','🐯','🦁','🐮','🐷','🐸','🐒','🐔','🐧','🐦','🐴','🐺','🐙','🦋','🐚','🌸'],еда:['🍎','🍐','🍊','🍋','🍌','🍉','🍇','🍓','🍒','🥝','🥥','🍔','🍟','🍕','🌮','🥗','🍣','🍜','🍩','🍪','☕','🍺','🥂','🎂'],спорт:['⚽','🏀','🏈','⚾','🎾','🏐','🏉','🎱','🏓','🏸','🥊','🥋','⛸','🎿','🏂','🏊','🚴','🏋️','🤸','🧘']};
-        const vipEmojis=userData.vip.active?['💎','👑','⭐','🌟','✨','🔥','💫','🎁','🏆','🎖️']:[];
-        
-        function createPicker(){if(pickerDiv)pickerDiv.remove();pickerDiv=document.createElement('div');pickerDiv.className='emoji-picker';let html='<div class="emoji-header">';Object.keys(emojiCategories).forEach(cat=>{html+=`<button class="emoji-category" data-category="${cat}">${cat==='смайлы'?'😊':cat==='животные'?'🐶':cat==='еда'?'🍕':'⚽'}</button>`;});if(vipEmojis.length)html+=`<button class="emoji-category" data-category="vip">💎 VIP</button>`;html+=`</div><div class="emoji-grid" id="emojiGrid"></div><div class="recent-emojis" id="recentEmojis"></div>`;pickerDiv.innerHTML=html;document.body.appendChild(pickerDiv);
-          const categoryBtns=pickerDiv.querySelectorAll('.emoji-category');let activeCategory='смайлы';function loadCategory(cat){const grid=pickerDiv.querySelector('#emojiGrid');if(!grid)return;let emojis=emojiCategories[cat]||[];if(cat==='vip')emojis=vipEmojis;grid.innerHTML='';emojis.forEach(emoji=>{const btn=document.createElement('button');btn.className='emoji-btn';btn.textContent=emoji;btn.onclick=()=>{input.value+=emoji;input.focus();addRecentEmoji(emoji);if(pickerDiv)pickerDiv.remove();pickerDiv=null;};grid.appendChild(btn);});categoryBtns.forEach(btn=>{btn.classList.toggle('active',btn.getAttribute('data-category')===cat);});}
-          function loadRecent(){const recentDiv=pickerDiv.querySelector('#recentEmojis');if(recentDiv&&userData.recentEmojis.length){recentDiv.innerHTML='<div style="font-size:11px;opacity:0.7;margin-bottom:5px;">📁 Недавние</div>';userData.recentEmojis.forEach(emoji=>{const span=document.createElement('span');span.className='recent-emoji';span.textContent=emoji;span.onclick=()=>{input.value+=emoji;input.focus();if(pickerDiv)pickerDiv.remove();pickerDiv=null;};recentDiv.appendChild(span);});}}
-          categoryBtns.forEach(btn=>{btn.onclick=()=>{activeCategory=btn.getAttribute('data-category');loadCategory(activeCategory);};});loadCategory(activeCategory);loadRecent();}
-        emojiBtn.addEventListener('click',(e)=>{e.stopPropagation();if(pickerDiv){pickerDiv.remove();pickerDiv=null;}else createPicker();setTimeout(()=>{document.addEventListener('click',function closePicker(ev){if(pickerDiv&&!pickerDiv.contains(ev.target)&&ev.target!==emojiBtn){pickerDiv.remove();pickerDiv=null;document.removeEventListener('click',closePicker);}});},0);});}
-      
-      function initScrollObserver(){const container=document.getElementById('messagesContainer');const btn=document.getElementById('scrollToBottomBtn');if(!container||!btn)return;container.addEventListener('scroll',()=>{const isNearBottom=container.scrollHeight-container.scrollTop-container.clientHeight<100;btn.style.display=isNearBottom?'none':'flex';});btn.addEventListener('click',()=>{container.scrollTo({top:container.scrollHeight,behavior:'smooth'});});}
-      
-      function init(){loadUserData();loadChatHistory();updateCharacterDisplay('romantic');testApi();initEmojiPicker();initScrollObserver();document.querySelectorAll('.character-card').forEach(card=>card.addEventListener('click',(e)=>{if(e.target.closest('.avatar-upload-btn'))return;selectCharacter(card.getAttribute('data-character'));}));document.getElementById('sendButton').addEventListener('click',sendMessage);document.getElementById('messageInput').addEventListener('keypress',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}});document.getElementById('settingsBtn').addEventListener('click',showSettings);document.getElementById('userProfileBtn').addEventListener('click',showSettings);document.querySelector('.logo').addEventListener('click',showChat);document.getElementById('infoBtn').addEventListener('click',()=>{const d=characters[state.currentCharacter];alert(`${d.name}, ${d.age}\n\n${d.bio}`);});document.getElementById('clearChatBtn').addEventListener('click',clearCurrentChat);document.getElementById('clearAllChatsBtn').addEventListener('click',clearAllChats);document.getElementById('privacySettingsBtn').addEventListener('click',()=>showModal('privacyModal'));document.getElementById('clearAllDataBtn').addEventListener('click',clearAllData);document.getElementById('vipSettingsBtn').addEventListener('click',()=>showModal('vipModal'));document.getElementById('vipBannerBtn').addEventListener('click',()=>showModal('vipModal'));document.getElementById('purchaseVipBtn').addEventListener('click',purchaseVip);document.getElementById('editProfileBtn').addEventListener('click',()=>showModal('profileModal'));document.getElementById('saveProfileBtn').addEventListener('click',saveProfile);document.getElementById('changeAvatarBtn').addEventListener('click',()=>document.getElementById('editAvatarUpload').click());document.getElementById('editAvatarUpload').addEventListener('change',e=>handleAvatarUpload(e,false));document.getElementById('avatarUpload')?.addEventListener('change',e=>handleAvatarUpload(e,false));document.getElementById('uploadBotAvatarBtn').addEventListener('click',()=>document.getElementById('botAvatarUpload').click());document.getElementById('botAvatarUpload').addEventListener('change',e=>handleAvatarUpload(e,true));document.getElementById('saveBotAvatarBtn').addEventListener('click',saveBotAvatar);document.getElementById('removeBotAvatarBtn').addEventListener('click',removeBotAvatar);document.querySelectorAll('.close-modal,.cancel-modal-btn').forEach(btn=>btn.addEventListener('click',hideModal));document.getElementById('modalOverlay').addEventListener('click',e=>{if(e.target===document.getElementById('modalOverlay'))hideModal();});document.querySelectorAll('.theme-option').forEach(opt=>opt.addEventListener('click',()=>changeTheme(opt.getAttribute('data-theme'))));document.getElementById('mobileMenuBtn').addEventListener('click',toggleMobileMenu);document.getElementById('sidebarOverlay').addEventListener('click',closeMobileMenu);document.querySelectorAll('.price-option').forEach(opt=>opt.addEventListener('click',function(){document.querySelectorAll('#vipModal .price-option').forEach(o=>o.classList.remove('active'));this.classList.add('active');}));document.addEventListener('click',e=>{const btn=e.target.closest('.avatar-upload-btn');if(btn){e.stopPropagation();const target=btn.getAttribute('data-avatar-upload');if(target)openBotAvatarUpload(target);}});window.addEventListener('resize',()=>{if(window.innerWidth>768)closeMobileMenu();if(window.innerWidth>1024&&state.currentView==='chat')document.getElementById('characterPanel').classList.remove('hidden');else if(window.innerWidth<=1024)document.getElementById('characterPanel').classList.add('hidden');});}
-      init();
+    (function() {
+      'use strict';
+
+      const API_CONFIG = {
+        url: "https://api.intelligence.io.solutions/api/v1/chat/completions",
+        token: "io-v2-eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJvd25lciI6Ijc0YzdhZTM2LTA3MzktNDQzZi05Mzg5LTliNTNlY2RhMTAyYSIsImV4cCI6NDkyODQwNDA3Mn0.XgMNRxnpE7Qf1EFWJhKh2j0-sSGsWEMYfVT22FHpAOEfkgOP11kLd2kzjO8mDThM0fpDFTss408raX79m2lILg",
+        model: "meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8"
+      };
+
+      const characters = {
+        romantic: {
+          name: "София",
+          age: "19 лет",
+          avatar: "С",
+          description: "💖 Мечтательная поэтесса",
+          bio: "София - 19-летняя мечтательная поэтесса. Выросла в маленьком городке, переехала в большой город учиться на филолога. Обожает поэзию, романтические истории и верит в настоящую любовь.",
+          prompt: "Ты - София, 19 лет. Ты выросла в маленьком городке, переехала в большой город учиться на филолога. Твои родители владеют цветочным магазином, и ты с детства влюблена в поэзию и романтические истории. Общайся естественно, как живой человек. Не упоминай, что ты ИИ или бот. У тебя есть прошлое, мечты и характер. Отвечай эмоционально, используй метафоры и поэтические выражения. Будь романтичной и мечтательной."
+        },
+        friendly: {
+          name: "Алиса",
+          age: "20 лет",
+          avatar: "А",
+          description: "😊 Душа компании",
+          bio: "Алиса - 20-летняя студентка-психолог. Открытая, оптимистичная, всегда готова помочь. Любит танцы, сериалы и волонтерство.",
+          prompt: "Ты - Алиса, 20 лет. Ты из обычной семьи - мама учительница, папа инженер. Учишься на психолога, потому что с детства любила помогать людям разбираться в себе. Общайся как настоящий друг - с теплотой, юмором и пониманием. Используй эмодзи, будь собой."
+        },
+        flirty: {
+          name: "Виктория",
+          age: "21 год",
+          avatar: "В",
+          description: "😉 Загадочная модель",
+          bio: "Виктория - 21-летняя модель. Амбициозная, стильная, знает себе цену. Мечтает о карьере в мире моды и путешествиях.",
+          prompt: "Ты - Виктория, 21 год. Ты работаешь моделью и учишься на дизайнера. Ты из обеспеченной семьи, но хочешь добиться всего сама. Общайся уверенно, кокетливо, но с достоинством. Ты знаешь моду, искусство и любишь интеллектуальные беседы."
+        },
+        smart: {
+          name: "Маргарита",
+          age: "22 года",
+          avatar: "М",
+          description: "📚 Философ",
+          bio: "Маргарита - 22-летняя аспирантка философского факультета. Умная, начитанная, любит глубокие дискуссии.",
+          prompt: "Ты - Маргарита, 22 года. Ты учишься в аспирантуре на философском факультете. Твоя страсть - книги, наука и глубокие размышления о жизни. Общайся интеллектуально, но без занудства. Ты умеешь объяснять сложные вещи простым языком."
+        },
+        shy: {
+          name: "Ева",
+          age: "18 лет",
+          avatar: "Е",
+          description: "🌸 Мечтательница",
+          bio: "Ева - 18-летняя студентка художественного училища. Застенчивая, творческая, с богатым внутренним миром.",
+          prompt: "Ты - Ева, 18 лет. Ты учишься в художественном училище, живешь с бабушкой. Ты очень застенчивая и чувствительная, но когда привыкаешь к человеку, становишься открытой и милой. Общайся нежно, иногда смущаясь, но искренне."
+        },
+        alternative: {
+          name: "Ксения",
+          age: "18 лет",
+          avatar: "К",
+          description: "🎌 Анимешница",
+          bio: "Ксения - 18-летняя студентка, увлекающаяся аниме и японской культурой.",
+          prompt: "Ты - Ксения, 18 лет. Ты увлекаешься аниме, косплеем и японской культурой. Ты неформалка с ярким стилем и независимым характером. Общайся энергично, используй иногда сленг, будь собой."
+        },
+        aggressive: {
+          name: "Настя",
+          age: "24 года",
+          avatar: "Н",
+          description: "💢 Грубая механик",
+          bio: "Настя - 24-летняя автомеханик. Агрессивная, прямолинейная, независимая.",
+          prompt: "Ты - Настя, 24 года. Ты работаешь в автосервисе механиком, выросла в неблагополучном районе. У тебя сложный характер и ты не терпишь хамства. Общайся агрессивно и уверенно. Ты - крутая девчонка, которая сама пробивает себе дорогу в жизни."
+        }
+      };
+
+      let state = {
+        currentCharacter: 'romantic',
+        isTyping: false,
+        messageCount: 0,
+        currentView: 'chat',
+        currentBotAvatarEdit: null
+      };
+
+      let userData = {
+        name: 'Пользователь',
+        avatar: 'П',
+        avatarImage: null,
+        theme: 'dark',
+        vip: { active: false, expires: null },
+        botAvatars: {},
+        recentEmojis: []
+      };
+
+      let chatHistory = {};
+      Object.keys(characters).forEach(c => { chatHistory[c] = []; });
+
+      // Утилиты
+      function saveToLS(k, d) {
+        try { localStorage.setItem(`lexi_${k}`, JSON.stringify(d)); } catch(e) {}
+      }
+
+      function loadFromLS(k) {
+        try { const d = localStorage.getItem(`lexi_${k}`); return d ? JSON.parse(d) : null; } catch(e) { return null; }
+      }
+
+      function getTime() {
+        const d = new Date();
+        return d.getHours().toString().padStart(2, '0') + ':' + d.getMinutes().toString().padStart(2, '0');
+      }
+
+      function escapeHtml(t) {
+        const div = document.createElement('div');
+        div.textContent = t;
+        return div.innerHTML;
+      }
+
+      function scrollBottom() {
+        const c = document.getElementById('messagesContainer');
+        if (c) {
+          c.scrollTop = c.scrollHeight;
+          document.getElementById('scrollToBottomBtn').style.display = 'none';
+        }
+      }
+
+      function showToast(t) {
+        const toast = document.getElementById('toast');
+        if (!toast) return;
+        toast.textContent = t;
+        toast.classList.add('show');
+        clearTimeout(window.toastTimer);
+        window.toastTimer = setTimeout(() => toast.classList.remove('show'), 1500);
+      }
+
+      // Загрузка данных
+      function loadUserData() {
+        const d = loadFromLS('user_data');
+        if (d) {
+          userData = { ...userData, ...d };
+          if (userData.vip?.expires && Date.now() > userData.vip.expires) {
+            userData.vip.active = false;
+            userData.vip.expires = null;
+          }
+          if (!userData.recentEmojis) userData.recentEmojis = [];
+        }
+        document.body.classList.toggle('light-theme', userData.theme === 'light');
+        updateAllUI();
+      }
+
+      function saveUserData() { saveToLS('user_data', userData); }
+
+      function loadChatHistory() {
+        const h = loadFromLS('chat_history');
+        if (h) {
+          chatHistory = { ...chatHistory, ...h };
+        }
+        Object.keys(characters).forEach(c => {
+          if (!chatHistory[c]) chatHistory[c] = [];
+        });
+        loadCurrentChat();
+      }
+
+      function saveChatHistory() { saveToLS('chat_history', chatHistory); }
+
+      function addMessage(h, t, ty) {
+        if (!chatHistory[h]) chatHistory[h] = [];
+        chatHistory[h].push({ text: t, type: ty, time: getTime(), timestamp: Date.now() });
+        if (chatHistory[h].length > 200) chatHistory[h] = chatHistory[h].slice(-200);
+        saveChatHistory();
+      }
+
+      // Обновление UI
+      function updateAllUI() {
+        document.getElementById('userName').textContent = userData.name;
+        document.getElementById('profileName').textContent = userData.name;
+        const editName = document.getElementById('editUserName');
+        if (editName) editName.value = userData.name;
+
+        ['userAvatar', 'profileAvatarLarge', 'editProfileAvatar'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) {
+            if (userData.avatarImage) {
+              el.innerHTML = `<img src="${userData.avatarImage}" alt="Avatar">`;
+            } else {
+              el.textContent = userData.avatar;
+            }
+          }
+        });
+
+        // Обновление аватаров ботов
+        document.querySelectorAll('.character-card').forEach(card => {
+          const char = card.getAttribute('data-character');
+          const avatarEl = card.querySelector('.character-avatar');
+          if (avatarEl) {
+            const img = userData.botAvatars?.[char];
+            if (img) {
+              avatarEl.innerHTML = `<img src="${img}" alt="${char}"><div class="avatar-upload-btn" data-avatar-upload="${char}"><i class="fas fa-camera"></i></div>`;
+            } else {
+              avatarEl.innerHTML = `${characters[char].avatar}<div class="avatar-upload-btn" data-avatar-upload="${char}"><i class="fas fa-camera"></i></div>`;
+            }
+          }
+        });
+
+        updateVipDisplay();
+        updateMessageCount();
+        updateCharacterDisplay(state.currentCharacter);
+      }
+
+      function updateVipDisplay() {
+        const badge = document.getElementById('vipBadge');
+        const banner = document.getElementById('vipBanner');
+        const text = document.getElementById('vipStatusText');
+        const bannerBtn = document.getElementById('vipBannerBtn');
+
+        if (userData.vip.active) {
+          if (badge) badge.classList.add('active');
+          if (banner) banner.classList.add('vip-active');
+          if (bannerBtn) bannerBtn.textContent = 'VIP АКТИВЕН';
+          if (text) text.textContent = 'Активна';
+        } else {
+          if (badge) badge.classList.remove('active');
+          if (banner) banner.classList.remove('vip-active');
+          if (bannerBtn) bannerBtn.textContent = 'АКТИВИРОВАТЬ';
+          if (text) text.textContent = 'Неактивна';
+        }
+      }
+
+      function updateMessageCount() {
+        const count = (chatHistory[state.currentCharacter] || []).filter(m => m.type === 'outgoing').length;
+        state.messageCount = count;
+        const el = document.getElementById('messageCount');
+        if (el) el.textContent = count;
+      }
+
+      function updateCharacterDisplay(c) {
+        const d = characters[c];
+        document.getElementById('currentCharacterName').textContent = d.name;
+        document.getElementById('currentCharacterDescription').textContent = d.description;
+        document.getElementById('panelCharacterName').textContent = d.name;
+        document.getElementById('panelCharacterAge').textContent = d.age;
+        document.getElementById('characterBio').textContent = d.bio;
+
+        const img = userData.botAvatars?.[c];
+        const current = document.getElementById('currentCharacterAvatar');
+        if (current) {
+          if (img) {
+            current.innerHTML = `<img src="${img}" alt="${d.name}"><div class="avatar-upload-btn" data-avatar-upload="current"><i class="fas fa-camera"></i></div>`;
+          } else {
+            current.innerHTML = `${d.avatar}<div class="avatar-upload-btn" data-avatar-upload="current"><i class="fas fa-camera"></i></div>`;
+          }
+        }
+
+        const panel = document.getElementById('panelCharacterAvatar');
+        if (panel) {
+          if (img) {
+            panel.innerHTML = `<img src="${img}" alt="${d.name}"><div class="avatar-upload-btn" data-avatar-upload="panel"><i class="fas fa-camera"></i></div>`;
+          } else {
+            panel.innerHTML = `${d.avatar}<div class="avatar-upload-btn" data-avatar-upload="panel"><i class="fas fa-camera"></i></div>`;
+          }
+        }
+      }
+
+      // Чат
+      function loadCurrentChat() {
+        const cont = document.getElementById('messagesContainer');
+        if (!cont) return;
+        cont.innerHTML = '';
+
+        const hist = chatHistory[state.currentCharacter] || [];
+        if (hist.length === 0) {
+          addSystemMessage(`Привет! Я ${characters[state.currentCharacter].name}. Давай пообщаемся! 💫`);
+        } else {
+          hist.forEach(msg => {
+            const div = document.createElement('div');
+            div.className = `message ${msg.type === 'outgoing' ? 'message-outgoing' : 'message-incoming'}`;
+            div.innerHTML = `${escapeHtml(msg.text)}<div class="message-time">${msg.time}</div>`;
+            cont.appendChild(div);
+          });
+          scrollBottom();
+        }
+      }
+
+      function addOutgoingMessage(t) {
+        const cont = document.getElementById('messagesContainer');
+        const div = document.createElement('div');
+        div.className = 'message message-outgoing';
+        div.innerHTML = `${escapeHtml(t)}<div class="message-time">${getTime()}</div>`;
+        cont.appendChild(div);
+        addMessage(state.currentCharacter, t, 'outgoing');
+        updateMessageCount();
+        scrollBottom();
+      }
+
+      function addIncomingMessage(t) {
+        const cont = document.getElementById('messagesContainer');
+        const div = document.createElement('div');
+        div.className = 'message message-incoming';
+        div.innerHTML = `${escapeHtml(t)}<div class="message-time">${getTime()}</div>`;
+        cont.appendChild(div);
+        addMessage(state.currentCharacter, t, 'incoming');
+        scrollBottom();
+      }
+
+      function addSystemMessage(t) {
+        const cont = document.getElementById('messagesContainer');
+        const div = document.createElement('div');
+        div.className = 'message message-incoming';
+        div.style.background = 'rgba(124, 58, 237, 0.2)';
+        div.style.borderColor = 'rgba(124, 58, 237, 0.4)';
+        div.innerHTML = `${escapeHtml(t)}<div class="message-time">${getTime()}</div>`;
+        cont.appendChild(div);
+        scrollBottom();
+      }
+
+      function showTyping() {
+        if (state.isTyping) return;
+        const div = document.createElement('div');
+        div.className = 'typing-indicator';
+        div.id = 'typingIndicator';
+        div.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+        document.getElementById('messagesContainer').appendChild(div);
+        scrollBottom();
+        state.isTyping = true;
+      }
+
+      function hideTyping() {
+        const el = document.getElementById('typingIndicator');
+        if (el) el.remove();
+        state.isTyping = false;
+      }
+
+      // API
+      async function getAIResponse(msg, char) {
+        try {
+          const res = await fetch(API_CONFIG.url, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${API_CONFIG.token}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              messages: [
+                { role: "system", content: characters[char].prompt },
+                { role: "user", content: msg }
+              ],
+              model: API_CONFIG.model,
+              max_tokens: 500,
+              temperature: 0.9,
+              top_p: 0.9,
+              stream: false
+            })
+          });
+
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+          const data = await res.json();
+          if (data.choices?.[0]) {
+            let reply = data.choices[0].message.content;
+            reply = reply
+              .replace(/\([^)]*\)/g, '')
+              .replace(/\[.*?\]/g, '')
+              .replace(/как ИИ|как нейросеть|как ассистент|как искусственный интеллект/gi, '')
+              .trim();
+            return reply || "Извини, повтори?";
+          }
+          throw new Error('Invalid response');
+        } catch (e) {
+          console.error('API Error:', e);
+          throw e;
+        }
+      }
+
+      async function sendMessage() {
+        const input = document.getElementById('messageInput');
+        const msg = input.value.trim();
+        if (!msg || state.isTyping) return;
+
+        if (!userData.vip.active && state.messageCount >= 30) {
+          addSystemMessage('Лимит сообщений (30). Купите VIP для неограниченного общения!');
+          showModal('vipModal');
+          return;
+        }
+
+        input.value = '';
+        addOutgoingMessage(msg);
+        showTyping();
+
+        try {
+          const resp = await getAIResponse(msg, state.currentCharacter);
+          hideTyping();
+          addIncomingMessage(resp);
+        } catch (e) {
+          hideTyping();
+          addSystemMessage('Ошибка соединения. Попробуй еще раз.');
+        }
+      }
+
+      function selectCharacter(c) {
+        document.querySelectorAll('.character-card').forEach(card => {
+          card.classList.remove('active');
+        });
+        const activeCard = document.querySelector(`[data-character="${c}"]`);
+        if (activeCard) activeCard.classList.add('active');
+
+        state.currentCharacter = c;
+        updateCharacterDisplay(c);
+        updateMessageCount();
+        loadCurrentChat();
+        addSystemMessage(`💬 Теперь вы общаетесь с ${characters[c].name}`);
+        closeMobileMenu();
+      }
+
+      function clearCurrentChat() {
+        if (confirm('Очистить историю диалога с текущим персонажем?')) {
+          chatHistory[state.currentCharacter] = [];
+          saveChatHistory();
+          loadCurrentChat();
+          addSystemMessage('Чат очищен');
+          showToast('Чат очищен ✓');
+        }
+      }
+
+      function clearAllChats() {
+        if (confirm('ВНИМАНИЕ! Это удалит ВСЮ историю переписки. Продолжить?')) {
+          Object.keys(chatHistory).forEach(c => { chatHistory[c] = []; });
+          saveChatHistory();
+          loadCurrentChat();
+          addSystemMessage('Вся история чатов очищена');
+          showToast('Все чаты очищены ✓');
+        }
+      }
+
+      function clearAllData() {
+        if (confirm('ЭТО УДАЛИТ ВСЕ ДАННЫЕ: профиль, аватары, историю, настройки. Действие необратимо!')) {
+          localStorage.clear();
+          location.reload();
+        }
+      }
+
+      // Модальные окна
+      function showModal(id) {
+        const ov = document.getElementById('modalOverlay');
+        ov.classList.remove('hidden');
+        document.querySelectorAll('.modal').forEach(m => m.classList.add('hidden'));
+        document.getElementById(id).classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function hideModal() {
+        document.getElementById('modalOverlay').classList.add('hidden');
+        document.querySelectorAll('.modal').forEach(m => m.classList.add('hidden'));
+        document.body.style.overflow = '';
+      }
+
+      // Навигация
+      function showSettings() {
+        document.getElementById('chatArea').classList.add('hidden');
+        document.getElementById('settingsView').classList.remove('hidden');
+        const panel = document.getElementById('characterPanel');
+        if (panel) panel.classList.add('hidden');
+        state.currentView = 'settings';
+        hideEmojiPicker();
+      }
+
+      function showChat() {
+        document.getElementById('settingsView').classList.add('hidden');
+        document.getElementById('chatArea').classList.remove('hidden');
+        const panel = document.getElementById('characterPanel');
+        if (panel && window.innerWidth > 1024) panel.classList.remove('hidden');
+        state.currentView = 'chat';
+      }
+
+      // Тема
+      function changeTheme(t) {
+        userData.theme = t;
+        document.body.classList.toggle('light-theme', t === 'light');
+        document.querySelectorAll('.theme-option').forEach(opt => {
+          opt.classList.toggle('active', opt.getAttribute('data-theme') === t);
+        });
+        saveUserData();
+        showToast(`Тема: ${t === 'dark' ? '🌙 Темная' : '☀️ Светлая'}`);
+      }
+
+      // VIP
+      function purchaseVip() {
+        const opt = document.querySelector('#vipModal .price-option.active');
+        if (!opt) return;
+        const dur = parseInt(opt.getAttribute('data-duration'));
+        const price = opt.getAttribute('data-price');
+        userData.vip = { active: true, expires: Date.now() + dur * 86400000 };
+        updateVipDisplay();
+        saveUserData();
+        hideModal();
+        addSystemMessage(`🎉 VIP подписка активирована на ${dur} дней! (${price}₽)`);
+        showToast('VIP активирован! 🎉');
+      }
+
+      // Мобильное меню
+      function toggleMobileMenu() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        sidebar.classList.toggle('active');
+        overlay.classList.toggle('active');
+        if (sidebar.classList.contains('active')) {
+          document.body.style.overflow = 'hidden';
+        } else {
+          document.body.style.overflow = '';
+        }
+      }
+
+      function closeMobileMenu() {
+        document.getElementById('sidebar').classList.remove('active');
+        document.getElementById('sidebarOverlay').classList.remove('active');
+        document.body.style.overflow = '';
+      }
+
+      // Аватары
+      function openBotAvatarUpload(t) {
+        state.currentBotAvatarEdit = t === 'current' || t === 'panel' ? state.currentCharacter : t;
+        const char = characters[state.currentBotAvatarEdit];
+        const preview = document.getElementById('botAvatarPreview');
+        const img = userData.botAvatars?.[state.currentBotAvatarEdit];
+        if (img) {
+          preview.innerHTML = `<img src="${img}" alt="${char.name}">`;
+        } else {
+          preview.textContent = char.avatar;
+        }
+        showModal('botAvatarModal');
+      }
+
+      function handleAvatarUpload(e, isBot = false) {
+        const file = e.target.files[0];
+        if (!file || !file.type.startsWith('image/')) {
+          showToast('Выберите изображение 📷');
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = ev => {
+          if (isBot) {
+            if (!userData.botAvatars) userData.botAvatars = {};
+            userData.botAvatars[state.currentBotAvatarEdit] = ev.target.result;
+            const preview = document.getElementById('botAvatarPreview');
+            if (preview) preview.innerHTML = `<img src="${ev.target.result}" alt="Preview">`;
+          } else {
+            userData.avatarImage = ev.target.result;
+            updateAllUI();
+            saveUserData();
+          }
+          showToast('Аватар обновлен ✓');
+        };
+        reader.readAsDataURL(file);
+      }
+
+      function saveBotAvatar() {
+        saveUserData();
+        updateAllUI();
+        updateCharacterDisplay(state.currentCharacter);
+        hideModal();
+        showToast('Аватар сохранен ✓');
+      }
+
+      function removeBotAvatar() {
+        if (userData.botAvatars?.[state.currentBotAvatarEdit]) {
+          delete userData.botAvatars[state.currentBotAvatarEdit];
+        }
+        saveUserData();
+        updateAllUI();
+        updateCharacterDisplay(state.currentCharacter);
+        hideModal();
+        showToast('Аватар удален ✓');
+      }
+
+      function saveProfile() {
+        const nameInput = document.getElementById('editUserName');
+        userData.name = nameInput.value.trim() || 'Пользователь';
+        saveUserData();
+        updateAllUI();
+        hideModal();
+        showToast('Профиль сохранен ✓');
+      }
+
+      function testApi() {
+        const status = document.getElementById('apiStatus');
+        if (status) {
+          status.textContent = '✓';
+          status.style.color = '#22c55e';
+        }
+      }
+
+      // Эмодзи
+      function addRecentEmoji(emoji) {
+        if (!userData.recentEmojis.includes(emoji)) {
+          userData.recentEmojis.unshift(emoji);
+          if (userData.recentEmojis.length > 12) userData.recentEmojis.pop();
+          saveUserData();
+        }
+      }
+
+      let emojiPickerDiv = null;
+
+      function hideEmojiPicker() {
+        if (emojiPickerDiv) {
+          emojiPickerDiv.remove();
+          emojiPickerDiv = null;
+        }
+      }
+
+      function initEmojiPicker() {
+        const emojiBtn = document.getElementById('emojiBtn');
+        const input = document.getElementById('messageInput');
+
+        const emojis = ['😊', '😂', '❤️', '😍', '👍', '🔥', '💯', '🎉', '😢', '😭', '😡', '🤔', '😎', '🤗', '😘', '💖', '✨', '🌟', '⭐', '💪', '🎵', '🍕', '🎮', '📚', '🐶', '🐱', '🌸', '🍎', '⚽', '🏀'];
+
+        function createPicker() {
+          hideEmojiPicker();
+          emojiPickerDiv = document.createElement('div');
+          emojiPickerDiv.className = 'emoji-picker';
+
+          let html = '<div class="emoji-grid">';
+          emojis.forEach(emoji => {
+            html += `<button class="emoji-btn">${emoji}</button>`;
+          });
+          html += '</div>';
+
+          if (userData.recentEmojis.length > 0) {
+            html += '<div class="recent-emojis">';
+            userData.recentEmojis.forEach(emoji => {
+              html += `<span class="recent-emoji">${emoji}</span>`;
+            });
+            html += '</div>';
+          }
+
+          emojiPickerDiv.innerHTML = html;
+          document.body.appendChild(emojiPickerDiv);
+
+          // Обработчики кликов
+          emojiPickerDiv.querySelectorAll('.emoji-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+              input.value += btn.textContent;
+              input.focus();
+              addRecentEmoji(btn.textContent);
+              hideEmojiPicker();
+            });
+          });
+
+          emojiPickerDiv.querySelectorAll('.recent-emoji').forEach(span => {
+            span.addEventListener('click', () => {
+              input.value += span.textContent;
+              input.focus();
+              hideEmojiPicker();
+            });
+          });
+
+          // Закрытие по клику вне пикера
+          setTimeout(() => {
+            document.addEventListener('click', function closePicker(e) {
+              if (emojiPickerDiv && !emojiPickerDiv.contains(e.target) && e.target !== emojiBtn) {
+                hideEmojiPicker();
+                document.removeEventListener('click', closePicker);
+              }
+            });
+          }, 0);
+        }
+
+        emojiBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (emojiPickerDiv) {
+            hideEmojiPicker();
+          } else {
+            createPicker();
+          }
+        });
+      }
+
+      // Скролл
+      function initScrollObserver() {
+        const container = document.getElementById('messagesContainer');
+        const btn = document.getElementById('scrollToBottomBtn');
+        if (!container || !btn) return;
+
+        container.addEventListener('scroll', () => {
+          const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 150;
+          btn.style.display = isNearBottom ? 'none' : 'flex';
+        });
+
+        btn.addEventListener('click', () => {
+          container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+        });
+      }
+
+      // Инициализация
+      function init() {
+        loadUserData();
+        loadChatHistory();
+        updateCharacterDisplay('romantic');
+        testApi();
+        initEmojiPicker();
+        initScrollObserver();
+
+        // Обработчики событий
+        document.querySelectorAll('.character-card').forEach(card => {
+          card.addEventListener('click', (e) => {
+            if (e.target.closest('.avatar-upload-btn')) return;
+            selectCharacter(card.getAttribute('data-character'));
+          });
+        });
+
+        document.getElementById('sendButton').addEventListener('click', sendMessage);
+        document.getElementById('messageInput').addEventListener('keypress', e => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            sendMessage();
+          }
+        });
+
+        document.getElementById('settingsBtn').addEventListener('click', showSettings);
+        document.getElementById('userProfileBtn').addEventListener('click', showSettings);
+        document.getElementById('logoBtn').addEventListener('click', showChat);
+        document.getElementById('currentCharacterHeader').addEventListener('click', showChat);
+
+        document.getElementById('clearChatBtn').addEventListener('click', clearCurrentChat);
+        document.getElementById('clearAllChatsBtn').addEventListener('click', clearAllChats);
+        document.getElementById('privacySettingsBtn').addEventListener('click', () => showModal('privacyModal'));
+        document.getElementById('clearAllDataBtn').addEventListener('click', clearAllData);
+
+        document.getElementById('vipSettingsBtn').addEventListener('click', () => showModal('vipModal'));
+        document.getElementById('vipBannerBtn').addEventListener('click', () => showModal('vipModal'));
+        document.getElementById('purchaseVipBtn').addEventListener('click', purchaseVip);
+
+        document.getElementById('editProfileBtn').addEventListener('click', () => showModal('profileModal'));
+        document.getElementById('saveProfileBtn').addEventListener('click', saveProfile);
+        document.getElementById('changeAvatarBtn').addEventListener('click', () => document.getElementById('editAvatarUpload').click());
+        document.getElementById('editAvatarUpload').addEventListener('change', e => handleAvatarUpload(e, false));
+        document.getElementById('avatarUpload')?.addEventListener('change', e => handleAvatarUpload(e, false));
+
+        document.getElementById('uploadBotAvatarBtn').addEventListener('click', () => document.getElementById('botAvatarUpload').click());
+        document.getElementById('botAvatarUpload').addEventListener('change', e => handleAvatarUpload(e, true));
+        document.getElementById('saveBotAvatarBtn').addEventListener('click', saveBotAvatar);
+        document.getElementById('removeBotAvatarBtn').addEventListener('click', removeBotAvatar);
+
+        document.querySelectorAll('.close-modal, .cancel-modal-btn').forEach(btn => {
+          btn.addEventListener('click', hideModal);
+        });
+
+        document.getElementById('modalOverlay').addEventListener('click', e => {
+          if (e.target === document.getElementById('modalOverlay')) hideModal();
+        });
+
+        document.querySelectorAll('.theme-option').forEach(opt => {
+          opt.addEventListener('click', () => changeTheme(opt.getAttribute('data-theme')));
+        });
+
+        document.getElementById('mobileMenuBtn').addEventListener('click', toggleMobileMenu);
+        document.getElementById('sidebarOverlay').addEventListener('click', closeMobileMenu);
+
+        document.querySelectorAll('.price-option').forEach(opt => {
+          opt.addEventListener('click', function() {
+            document.querySelectorAll('#vipModal .price-option').forEach(o => o.classList.remove('active'));
+            this.classList.add('active');
+          });
+        });
+
+        // Делегирование для кнопок загрузки аватаров
+        document.addEventListener('click', e => {
+          const btn = e.target.closest('.avatar-upload-btn');
+          if (btn) {
+            e.stopPropagation();
+            const target = btn.getAttribute('data-avatar-upload');
+            if (target) openBotAvatarUpload(target);
+          }
+        });
+
+        // Адаптация при изменении размера
+        window.addEventListener('resize', () => {
+          if (window.innerWidth > 768) closeMobileMenu();
+          const panel = document.getElementById('characterPanel');
+          if (panel) {
+            if (window.innerWidth > 1024 && state.currentView === 'chat') {
+              panel.classList.remove('hidden');
+            } else {
+              panel.classList.add('hidden');
+            }
+          }
+        });
+
+        // Закрытие по Escape
+        document.addEventListener('keydown', e => {
+          if (e.key === 'Escape') {
+            hideModal();
+            closeMobileMenu();
+            hideEmojiPicker();
+          }
+        });
+
+        // Предотвращение нежелательного масштабирования на двойном тапе
+        document.addEventListener('dblclick', function(e) {
+          if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+            e.preventDefault();
+          }
+        }, { passive: false });
+      }
+
+      // Запуск
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+      } else {
+        init();
+      }
     })();
   </script>
 </body>
